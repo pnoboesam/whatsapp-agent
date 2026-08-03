@@ -28,9 +28,5 @@ def get_retriever(k:int = 5):
         ],
         weights=[0.7, 0.3]
     )
-    docs = retriever.invoke('Do you accept apex?')
-    print(len(docs))
 
     return retriever
-
-get_retriever()

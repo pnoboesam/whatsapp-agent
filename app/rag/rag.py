@@ -6,20 +6,11 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
 from .retrieval import get_retriever
-from app.config import BASE_DIR
-
+from app.prompts import load_prompt
 from icecream import ic as print
 
+
 retriever = get_retriever()
-
-def load_prompt(name):
-    PROMPTS_DIR = BASE_DIR / "app" / "prompts"
-
-    path = PROMPTS_DIR / f"{name}.txt"
-
-    with open(path, "r", encoding="utf-8") as f:
-        return f.read()
-
 
 template = load_prompt('rag_promptv1')
 
@@ -42,4 +33,4 @@ def answer_question(question: str):
     answer = chain.invoke(question)
     return answer
 
-print(answer_question('where are you located'))
+# print(answer_question('where are you located'))

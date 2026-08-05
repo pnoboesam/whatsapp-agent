@@ -6,7 +6,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
 from .retrieval import get_retriever
-from app.prompts import load_prompt
+from app.prompts.prompts import load_prompt
 from icecream import ic as print
 
 

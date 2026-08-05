@@ -1,29 +1,52 @@
+import os
+from dotenv import load_dotenv
+from icecream import ic as print
+
 from app.prompts import load_prompt
-from .retrieval_tool import retriever_tool
+from .tools.retrieval_tool import retriever_tool
+from .tools.append_lead_details import append_lead_details
 
 from langchain.agents import create_agent
 from langchain_openrouter import ChatOpenRouter
+from langgraph.checkpoint.postgres import PostgresSaver
 
-from icecream import ic as print
+load_dotenv()
 
+DB_URI = os.getenv('DATABASE_URL')
+SYSTEM_PROMPT = load_prompt('wa_agent_promptv2') 
 
 llm = ChatOpenRouter(
     model = 'openai/gpt-5.6-luna',
     temperature = 0,
 )
 
-SYSTEM_PROMPT = load_prompt('wa_agent_promptv1')
-agent = create_agent(
-    model=llm,
-    tools=[retriever_tool],
-    system_prompt=(SYSTEM_PROMPT),
-)
 
-result = agent.invoke({
-    "messages": [{
-        "role":"user",
-        "content": "Do you accept apex"
-    }]
-})
+with PostgresSaver.from_conn_string(DB_URI) as checkpointer:
+    # checkpointer.setup()
 
-print(result['messages'][-1].content)
+    
+    agent = create_agent(
+        model=llm,
+        tools=[retriever_tool, append_lead_details],
+        system_prompt=(SYSTEM_PROMPT),
+        checkpointer=checkpointer,
+    )
+
+
+    config = {'configurable': {'thread_id': '233501234566'}}
+    
+
+    result = agent.invoke(
+        {
+            "messages": [{
+                "role":"user",
+                "content": "what is my name"
+            }]
+        },
+        config = config
+    )
+
+    print(result['messages'][-1].content)
+
+# next implement memory (supabase-postgres)
+# implement google sheet logging and email sending

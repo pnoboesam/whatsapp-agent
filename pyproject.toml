@@ -19,4 +19,9 @@ dependencies = [
     "rank-bm25>=0.2.2",
     "icecream>=2.2.0",
     "langchain-classic>=1.0.8",
+    "langgraph-checkpoint-postgres>=3.1.1",
+    "psycopg-binary>=3.3.4",
+    "langchain-mcp-adapters>=0.3.1",
+    "gspread>=6.2.1",
+    "google-auth>=2.56.2",
 ]

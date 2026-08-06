@@ -13,7 +13,7 @@ from langgraph.checkpoint.postgres import PostgresSaver
 load_dotenv()
 
 DB_URI = os.getenv('DATABASE_URL')
-SYSTEM_PROMPT = load_prompt('wa_agent_prompt') 
+SYSTEM_PROMPT = load_prompt('wa_agent_promptv1') 
 
 llm = ChatOpenRouter(
     model = 'openai/gpt-5.6-luna',

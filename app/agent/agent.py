@@ -20,37 +20,37 @@ llm = ChatOpenRouter(
     temperature = 0,
 )
 
-"""
 
-with PostgresSaver.from_conn_string(DB_URI) as checkpointer:
-    # checkpointer.setup()
-   
-    agent = create_agent(
-        model=llm,
-        tools=[retriever_tool, append_lead_details],
-        system_prompt=(SYSTEM_PROMPT),
-        checkpointer=checkpointer,
-    )
+def chat (thread_id: str, message: str) -> str:
 
-
-    config = {'configurable': {'thread_id': '233501234566'}}
+    with PostgresSaver.from_conn_string(DB_URI) as checkpointer:
+        # checkpointer.setup()
     
+        agent = create_agent(
+            model=llm,
+            tools=[retriever_tool, append_lead_details],
+            system_prompt=(SYSTEM_PROMPT),
+            checkpointer=checkpointer,
+        )
 
-    result = agent.invoke(
-        {
-            "messages": [{
-                "role":"user",
-                "content": "what is my name"
-            }]
-        },
-        config = config
-    )
+        config = {'configurable': {'thread_id': thread_id}}
 
-    print(result['messages'][-1].content)
+   
+        result = agent.invoke(
+            {
+                "messages": [{
+                    "role":"user",
+                    "content": message
+                }]
+            },
+            config = config
+        )
+
+        return result['messages'][-1].content    
+
+
 
 """
-
-
 ## Test Agent Flow -------------------------
 
 
@@ -89,4 +89,4 @@ with PostgresSaver.from_conn_string(DB_URI) as checkpointer:
         print(f"\nAgent: {result['messages'][-1].content}\n")
 
 ## Test Agent Flow -------------------------
-
+"""

@@ -36,7 +36,7 @@ def append_lead(lead: Lead):
 
     print('Lead added')
 
-
+# Test API
 if __name__ == "__main__":
     lead = Lead(
         full_name="Prince",

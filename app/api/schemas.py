@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 
 class ChatRequest(BaseModel):
@@ -6,3 +7,5 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     response:str
+    thread_id: str
+    timestamp: datetime

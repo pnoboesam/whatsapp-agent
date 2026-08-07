@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from datetime import datetime, timezone
 from app.agent import agent
 from app.api.schemas import ChatResponse, ChatRequest
 
@@ -11,6 +12,10 @@ def chat(payload: ChatRequest):
 
     response = agent.chat(payload.thread_id, payload.message)
     
-    return ChatResponse(response=response)
+    return ChatResponse(
+        response=response,
+        thread_id = payload.thread_id,
+        timestamp=datetime.now(timezone.utc),
+        )
 
 

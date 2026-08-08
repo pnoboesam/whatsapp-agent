@@ -49,8 +49,15 @@ def verify_webhook(
 async def receive_message(request:Request):
     payload = await request.json()
 
-    print("WhatsApp webhook received:")
-    print(payload)
+    result = extract_message(payload)
+
+    if result is None:
+        return {"status": "ignored"}
+
+    wa_number, text = result
+
+    print("WhatsApp number:", wa_number)
+    print("Message:", text)
 
     return {"status": "ok"}
 

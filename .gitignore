@@ -1,13 +1,15 @@
 # Python-generated files
 __pycache__/
 *.py[oc]
+*.pyc
 build/
 dist/
 wheels/
+.ipynb_checkpoints/
 *.egg-info
 
 # Virtual environments
-.venv
+.venv/
 
 # Environment variables
 secrets/

@@ -7,6 +7,30 @@ load_dotenv()
 
 router = APIRouter(prefix="/api/v1/whatsapp", tags=["whatsapp"])
 
+# Check if incoming message is text
+def extract_message(payload: dict):
+
+    try:
+        value = payload["entry"][0]["changes"][0]["value"]
+        messages = value.get("messages")
+
+        if not messages:
+            return None
+
+        message = messages[0]
+
+        if message.get("type") != "text":
+            return None
+
+        wa_number = message["from"]
+        text = message["text"]["body"]
+
+        return wa_number, text
+
+    except (KeyError, IndexError, TypeError):
+        return None
+
+
 @router.get("/webhook")
 def verify_webhook(
     hub_mode: str = Query(..., alias="hub.mode"),
@@ -19,6 +43,7 @@ def verify_webhook(
         return int(hub_challenge)
 
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Verification failed")
+
 
 @router.post("/webhook")
 async def receive_message(request:Request):

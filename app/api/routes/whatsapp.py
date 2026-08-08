@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-from fastapi import APIRouter, Query, HTTPException, status
+from fastapi import APIRouter, Query, HTTPException, Request, status
 
 load_dotenv()
 
@@ -21,6 +21,11 @@ def verify_webhook(
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Verification failed")
 
 @router.post("/webhook")
-def receive_message():
-    ...
+async def receive_message(request:Request):
+    payload = await request.json()
+
+    print("WhatsApp webhook received:")
+    print(payload)
+
+    return {"status": "ok"}
 

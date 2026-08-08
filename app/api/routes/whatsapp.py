@@ -1,6 +1,9 @@
 import os
 from dotenv import load_dotenv
 
+from app.agent import agent
+from app.services.whatsapp import send_message
+
 from fastapi import APIRouter, Query, HTTPException, Request, status
 
 load_dotenv()
@@ -56,8 +59,15 @@ async def receive_message(request:Request):
 
     wa_number, text = result
 
-    print("WhatsApp number:", wa_number)
-    print("Message:", text)
+    response = agent.chat(
+        wa_number,
+        text
+    )
+
+    await send_message(
+        recipient=wa_number,
+        message=response
+    )
 
     return {"status": "ok"}
 

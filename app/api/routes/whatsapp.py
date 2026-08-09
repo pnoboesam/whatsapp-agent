@@ -4,11 +4,28 @@ from dotenv import load_dotenv
 from app.agent import agent
 from app.services.whatsapp import send_message
 
-from fastapi import APIRouter, Query, HTTPException, Request, status
+from fastapi import APIRouter, Query, HTTPException, Request, status, BackgroundTasks
 
 load_dotenv()
 
 router = APIRouter(prefix="/api/v1/whatsapp", tags=["whatsapp"])
+
+
+async def process_message(wa_number: str, text: str):
+    print("Background processing started")
+
+    response = agent.chat(
+        wa_number,
+        text
+    )
+
+    await send_message(
+        recipient=wa_number,
+        message=response
+    )
+
+    print("Background processing completed")
+
 
 # Check if incoming message is text
 def extract_message(payload: dict):
@@ -49,7 +66,7 @@ def verify_webhook(
 
 
 @router.post("/webhook")
-async def receive_message(request:Request):
+async def receive_message(request:Request, background_tasks: BackgroundTasks):
     payload = await request.json()
 
     result = extract_message(payload)
@@ -59,14 +76,10 @@ async def receive_message(request:Request):
 
     wa_number, text = result
 
-    response = agent.chat(
+    background_tasks.add_task(
+        process_message,
         wa_number,
-        text
-    )
-
-    await send_message(
-        recipient=wa_number,
-        message=response
+        text,
     )
 
     return {"status": "ok"}

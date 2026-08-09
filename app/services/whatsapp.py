@@ -42,6 +42,9 @@ async def send_message(recipient: str, message: str):
     print("Meta status:", response.status_code)
     print("Meta response:", response.text)
 
+    print("Recipient:", recipient)
+    print("Message Sent:", message)
+
     return response.json()
 
 

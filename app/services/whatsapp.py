@@ -39,7 +39,8 @@ async def send_message(recipient: str, message: str):
             json=payload,
         )
 
-    response.raise_for_status()
+    print("Meta status:", response.status_code)
+    print("Meta response:", response.text)
 
     return response.json()
 
@@ -53,5 +54,3 @@ if __name__ == "__main__":
             message="Hello from my LangC WhatsApp agent"
         )
     )
-
-    print("Message sent")

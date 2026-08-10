@@ -11,6 +11,8 @@ from fastapi import APIRouter, Query, HTTPException, Request, status, Background
 
 load_dotenv()
 logger = logging.getLogger(__name__)
+processed_messages = set()
+
 router = APIRouter(prefix="/api/v1/whatsapp", tags=["whatsapp"])
 
 
@@ -121,6 +123,15 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
     text = result["text"]
     message_id = result["message_id"]
 
+    if message_id in processed_messages:
+        logger.info(
+            "Duplicate message ignored: %s",
+            message_id
+        )
+        return {"status": "duplicate"}
+
+    processed_messages.add(message_id)
+        
     background_tasks.add_task(
         process_message,
         wa_number,

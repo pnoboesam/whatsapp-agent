@@ -1,4 +1,6 @@
 import os
+import hmac
+import hashlib
 from dotenv import load_dotenv
 
 from app.agent import agent
@@ -9,6 +11,30 @@ from fastapi import APIRouter, Query, HTTPException, Request, status, Background
 load_dotenv()
 
 router = APIRouter(prefix="/api/v1/whatsapp", tags=["whatsapp"])
+
+
+def verify_signature(payload: bytes, signature: str | None) -> bool:
+
+    app_secret = os.getenv("META_APP_SECRET")
+
+    if not app_secret or not signature:
+        return False
+
+    if not signature.startswith("sha256="):
+        return False
+
+    expected_signature = hmac.new(
+        app_secret.encode("utf-8"),
+        payload,
+        hashlib.sha256,
+    ).hexdigest()
+
+    received_signature = signature.removeprefix("sha256=")
+
+    return hmac.compare_digest(
+        expected_signature,
+        received_signature,
+    )
 
 
 async def process_message(wa_number: str, text: str):
@@ -67,6 +93,18 @@ def verify_webhook(
 
 @router.post("/webhook")
 async def receive_message(request:Request, background_tasks: BackgroundTasks):
+    body = await request.body()
+
+    signature = request.headers.get(
+        "X-Hub-Signature-256"
+    )
+
+    if not verify_signature(body, signature):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid webhook signature",
+        )
+
     payload = await request.json()
 
     result = extract_message(payload)

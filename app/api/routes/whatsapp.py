@@ -11,7 +11,7 @@ from fastapi import APIRouter, Query, HTTPException, Request, status, Background
 
 load_dotenv()
 logger = logging.getLogger(__name__)
-processed_messages = set()
+processed_messages = set() # temporary will connect to database
 
 router = APIRouter(prefix="/api/v1/whatsapp", tags=["whatsapp"])
 

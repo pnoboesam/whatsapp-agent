@@ -1,6 +1,7 @@
 import os
 import hmac
 import hashlib
+import logging
 from dotenv import load_dotenv
 
 from app.agent import agent
@@ -9,6 +10,12 @@ from app.services.whatsapp import send_message
 from fastapi import APIRouter, Query, HTTPException, Request, status, BackgroundTasks
 
 load_dotenv()
+logger = logging.getLogger(__name__)
+# print("LOGGER:", logger.name)
+# print("LOGGER LEVEL:", logger.level)
+# print("EFFECTIVE LEVEL:", logger.getEffectiveLevel())
+# logger.setLevel(logging.INFO)
+
 
 router = APIRouter(prefix="/api/v1/whatsapp", tags=["whatsapp"])
 
@@ -38,19 +45,22 @@ def verify_signature(payload: bytes, signature: str | None) -> bool:
 
 
 async def process_message(wa_number: str, text: str):
-    print("Background processing started")
+    logger.info("Background processing started for %s", wa_number)
+    
+    try:    
+        response = agent.chat(
+            wa_number,
+            text
+        )
+        await send_message(
+            recipient=wa_number,
+            message=response
+        )
+        logger.info("Background processing completed for %s", wa_number)
 
-    response = agent.chat(
-        wa_number,
-        text
-    )
+    except Exception:
+        logger.exception("Message processing failed")
 
-    await send_message(
-        recipient=wa_number,
-        message=response
-    )
-
-    print("Background processing completed")
 
 
 # Check if incoming message is text
@@ -68,10 +78,11 @@ def extract_message(payload: dict):
         if message.get("type") != "text":
             return None
 
-        wa_number = message["from"]
-        text = message["text"]["body"]
-
-        return wa_number, text
+        return {
+            "wa_number": message["from"],
+            "text": message["text"]["body"],
+            "message_id": message["id"],
+        }
 
     except (KeyError, IndexError, TypeError):
         return None
@@ -112,7 +123,9 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
     if result is None:
         return {"status": "ignored"}
 
-    wa_number, text = result
+    wa_number = result["wa_number"]
+    text = result["text"]
+    message_id = result["message_id"]
 
     background_tasks.add_task(
         process_message,

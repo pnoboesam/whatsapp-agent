@@ -10,7 +10,26 @@ secret = os.getenv("META_APP_SECRET")
 
 body = b'''{
     "object": "whatsapp_business_account",
-    "entry": []
+    "entry": [
+        {
+            "changes": [
+                {
+                    "value": {
+                        "messages": [
+                            {
+                                "id": "test-message-123",
+                                "from": "233555123456",
+                                "type": "text",
+                                "text": {
+                                    "body": "Hello"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
 }'''
 
 signature = hmac.new(

@@ -11,12 +11,6 @@ from fastapi import APIRouter, Query, HTTPException, Request, status, Background
 
 load_dotenv()
 logger = logging.getLogger(__name__)
-# print("LOGGER:", logger.name)
-# print("LOGGER LEVEL:", logger.level)
-# print("EFFECTIVE LEVEL:", logger.getEffectiveLevel())
-# logger.setLevel(logging.INFO)
-
-
 router = APIRouter(prefix="/api/v1/whatsapp", tags=["whatsapp"])
 
 

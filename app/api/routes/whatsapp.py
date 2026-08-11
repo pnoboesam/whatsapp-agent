@@ -6,13 +6,16 @@ from dotenv import load_dotenv
 
 from app.agent import agent
 from app.services.whatsapp import send_message
-from app.services.db_businesses import get_business_by_phone_number_id
+from app.services.db_businesses import get_business
+from app.services.db_contacts import get_or_create_contact
+from app.services.db_conversations import get_or_create_conversation
+from app.services.db_messages import create_message
 
 from fastapi import APIRouter, Query, HTTPException, Request, status, BackgroundTasks
 
 load_dotenv()
 logger = logging.getLogger(__name__)
-processed_messages = set() # temporary will connect to database
+# processed_messages = set() # temporary will connect to database
 
 router = APIRouter(prefix="/api/v1/whatsapp", tags=["whatsapp"])
 
@@ -126,7 +129,7 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
     message_id = result["message_id"]
     phone_number_id = result["phone_number_id"]
 
-    business = get_business_by_phone_number_id(phone_number_id)
+    business = get_business(phone_number_id)
 
     if business is None:
         logger.error(
@@ -135,15 +138,66 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
         )
         return {"status": "ignored"}
 
-    if message_id in processed_messages:
+    business_id = business["id"]
+    contact = get_or_create_contact(
+        business_id=business_id,
+        whatsapp_phone=wa_number,
+        )
+
+    logger.info(
+        "Contact resolved: business=%s contact=%s",
+        business_id,
+        contact["id"],
+    )
+
+    conversation = get_or_create_conversation(
+        business_id=business_id,
+        contact_id=contact["id"],
+        whatsapp_phone=wa_number,
+    )
+
+    logger.info(
+        "Converastion resolved: business=%s contact=%s conversation=%s",
+        business_id,
+        contact["id"],
+        conversation["id"]
+    )
+
+
+    # if message_id in processed_messages:
+    #     logger.info(
+    #         "Duplicate message ignored: %s",
+    #         message_id
+    #     )
+    #     return {"status": "duplicate"}
+
+    # processed_messages.add(message_id)
+
+    message = create_message(
+        business_id=business_id,
+        contact_id=contact["id"],
+        conversation_id=conversation["id"],
+        external_message_id=message_id,
+        content=text,
+    )
+
+    if message is None:
         logger.info(
             "Duplicate message ignored: %s",
             message_id
         )
         return {"status": "duplicate"}
 
-    processed_messages.add(message_id)
+
+    logger.info(
+        "Message resolved: business=%s contact=%s conversation=%s whatsapp_message_id=%s",
+        business_id,
+        contact["id"],
+        conversation["id"],
+        message_id
+    )
         
+     
     background_tasks.add_task(
         process_message,
         wa_number,

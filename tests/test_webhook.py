@@ -16,12 +16,12 @@ body = b'''{
                 {
                     "value": {
                         "metadata": {
-                            "phone_number_id": "-1069329939606586"
+                            "phone_number_id": "1069329939606586"
                             },
                         "messages": [
                             {
                                 "id": "test-message-123",
-                                "from": "23355123456",
+                                "from": "+23355123456",
                                 "type": "text",
                                 "text": {
                                     "body": "Hello"

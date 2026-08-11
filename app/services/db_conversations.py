@@ -1,12 +1,12 @@
 from app.db.client import supabase
 
-def get_or_create_contact(business_id: str, whatsapp_phone: str):
+def get_or_create_conversation(business_id: str, contact_id: str, whatsapp_phone: str):
     response = (
         supabase
-        .table("contacts")
+        .table("conversations")
         .select("*")
         .eq("business_id", business_id)
-        .eq("whatsapp_phone", whatsapp_phone)
+        .eq("contact_id", contact_id)
         .maybe_single()
         .execute()
     )
@@ -16,14 +16,13 @@ def get_or_create_contact(business_id: str, whatsapp_phone: str):
 
     response = (
         supabase
-        .table("contacts")
+        .table("conversations")
         .insert({
             "business_id": business_id,
+            "contact_id": contact_id,
             "whatsapp_phone": whatsapp_phone,
         })
         .execute()
     )
 
     return response.data[0]
-
-

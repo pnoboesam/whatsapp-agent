@@ -1,6 +1,6 @@
 from app.db.client import supabase
 
-def get_business_by_phone_number_id(phone_number_id: str):
+def get_business(phone_number_id: str):
     response = (
         supabase
         .table("businesses")

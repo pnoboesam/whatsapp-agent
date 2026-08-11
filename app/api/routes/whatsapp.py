@@ -74,6 +74,7 @@ async def process_message(
             direction="outbound",
             sender_type="ai",
             status="sent",
+            raw_payload=send_response,
         )
 
         logger.info(
@@ -201,6 +202,7 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
         direction="inbound",
         sender_type="customer",
         status="received",
+        raw_payload=payload,
     )
 
     if message is None:

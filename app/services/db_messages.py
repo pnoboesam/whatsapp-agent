@@ -10,6 +10,7 @@ def create_message(
     direction: str,
     sender_type: str,
     status: str,
+    raw_payload: dict,
     message_type: str = "text",
 ):
     try:
@@ -26,6 +27,7 @@ def create_message(
                 "content": content,
                 "message_type": message_type,
                 "status": status,
+                "raw_payload": raw_payload,
             })
             .execute()
         )

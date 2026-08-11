@@ -107,13 +107,15 @@ def extract_message(payload: dict):
 
         if message.get("type") != "text":
             return None
-
+     
         return {
             "wa_number": message["from"],
             "text": message["text"]["body"],
             "message_id": message["id"],
+            "whatsapp_name": value["contacts"][0]["profile"]["name"],
             "phone_number_id": value["metadata"]["phone_number_id"],
         }
+        
 
     except (KeyError, IndexError, TypeError):
         return None
@@ -158,6 +160,7 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
     wa_number = result["wa_number"]
     message_id = result["message_id"]
     phone_number_id = result["phone_number_id"]
+    whatsapp_name = result["whatsapp_name"]
 
     business = get_business(phone_number_id)
 
@@ -172,6 +175,7 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
     contact = get_or_create_contact(
         business_id=business_id,
         whatsapp_phone=wa_number,
+        whatsapp_name=whatsapp_name
         )
 
     logger.info(

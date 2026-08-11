@@ -9,30 +9,46 @@ load_dotenv()
 secret = os.getenv("META_APP_SECRET")
 
 body = b'''{
-    "object": "whatsapp_business_account",
-    "entry": [
+  "entry": [
+    {
+      "id": "770846489383893",
+      "changes": [
         {
-            "changes": [
-                {
-                    "value": {
-                        "metadata": {
-                            "phone_number_id": "1069329939606586"
-                            },
-                        "messages": [
-                            {
-                                "id": "test-message-126r999993",
-                                "from": "+233553343550",
-                                "type": "text",
-                                "text": {
-                                    "body": "Hello"
-                                }
-                            }
-                        ]
-                    }
-                }
-            ]
+          "field": "messages",
+          "value": {
+            "contacts": [
+              {
+                "wa_id": "233553343550",
+                "profile": {
+                  "name": "MarketingIsPrince",
+                  "username": "pnoboesam"
+                },
+                "user_id": "GH.1325970839515651"
+              }
+            ],
+            "messages": [
+              {
+                "id": "43rd",
+                "from": "233553343550",
+                "text": {
+                  "body": "do you remove tattoos"
+                },
+                "type": "text",
+                "timestamp": "1786480176",
+                "from_user_id": "GH.1325970839515651"
+              }
+            ],
+            "metadata": {
+              "phone_number_id": "1069329939606586",
+              "display_phone_number": "233269017360"
+            },
+            "messaging_product": "whatsapp"
+          }
         }
-    ]
+      ]
+    }
+  ],
+  "object": "whatsapp_business_account"
 }'''
 
 signature = hmac.new(

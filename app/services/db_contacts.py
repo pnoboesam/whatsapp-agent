@@ -1,6 +1,6 @@
 from app.db.client import supabase
 
-def get_or_create_contact(business_id: str, whatsapp_phone: str):
+def get_or_create_contact(business_id: str, whatsapp_phone: str, whatsapp_name: str):
     response = (
         supabase
         .table("contacts")
@@ -20,6 +20,7 @@ def get_or_create_contact(business_id: str, whatsapp_phone: str):
         .insert({
             "business_id": business_id,
             "whatsapp_phone": whatsapp_phone,
+            "whatsapp_name": whatsapp_name,
         })
         .execute()
     )

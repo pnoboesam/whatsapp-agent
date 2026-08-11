@@ -20,8 +20,8 @@ body = b'''{
                             },
                         "messages": [
                             {
-                                "id": "test-message-123",
-                                "from": "+23355123456",
+                                "id": "test-message-126r3",
+                                "from": "+233553343550",
                                 "type": "text",
                                 "text": {
                                     "body": "Hello"

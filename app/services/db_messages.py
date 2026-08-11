@@ -7,6 +7,10 @@ def create_message(
     contact_id: str,
     external_message_id: str,
     content: str,
+    direction: str,
+    sender_type: str,
+    status: str,
+    message_type: str = "text",
 ):
     try:
         response = (
@@ -17,11 +21,11 @@ def create_message(
                 "conversation_id": conversation_id,
                 "contact_id": contact_id,
                 "external_message_id": external_message_id,
-                "direction": "inbound",
-                "sender_type": "customer",
+                "direction": direction,
+                "sender_type": sender_type,
                 "content": content,
-                "message_type": "text",
-                "status": "received",
+                "message_type": message_type,
+                "status": status,
             })
             .execute()
         )

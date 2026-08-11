@@ -15,7 +15,6 @@ from fastapi import APIRouter, Query, HTTPException, Request, status, Background
 
 load_dotenv()
 logger = logging.getLogger(__name__)
-# processed_messages = set() # temporary will connect to database
 
 router = APIRouter(prefix="/api/v1/whatsapp", tags=["whatsapp"])
 
@@ -44,7 +43,13 @@ def verify_signature(payload: bytes, signature: str | None) -> bool:
     )
 
 
-async def process_message(wa_number: str, text: str):
+async def process_message(
+        wa_number: str, 
+        text: str,
+        business_id: str,
+        contact_id: str,
+        conversation_id: str,
+        ):
     logger.info("Background processing started for %s", wa_number)
     
     try:    
@@ -52,10 +57,34 @@ async def process_message(wa_number: str, text: str):
             wa_number,
             text
         )
-        await send_message(
+
+        send_response = await send_message(
             recipient=wa_number,
             message=response
         )
+        
+        outbound_message_id = send_response["messages"][0]["id"]
+
+        create_message(
+            business_id=business_id,
+            contact_id=contact_id,
+            conversation_id=conversation_id,
+            external_message_id=outbound_message_id,
+            content=response,
+            direction="outbound",
+            sender_type="ai",
+            status="sent",
+        )
+
+        logger.info(
+            "Outbound message persisted, WhatsApp message sent: business=%s "
+            "contact=%s conversation=%s whatsapp_message_id=%s",
+            business_id,
+            contact_id,
+            conversation_id,
+            outbound_message_id,
+        )
+
         logger.info("Background processing completed for %s", wa_number)
 
     except Exception:
@@ -163,22 +192,15 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
         conversation["id"]
     )
 
-
-    # if message_id in processed_messages:
-    #     logger.info(
-    #         "Duplicate message ignored: %s",
-    #         message_id
-    #     )
-    #     return {"status": "duplicate"}
-
-    # processed_messages.add(message_id)
-
     message = create_message(
         business_id=business_id,
         contact_id=contact["id"],
         conversation_id=conversation["id"],
         external_message_id=message_id,
         content=text,
+        direction="inbound",
+        sender_type="customer",
+        status="received",
     )
 
     if message is None:
@@ -202,6 +224,9 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
         process_message,
         wa_number,
         text,
+        business_id,
+        contact["id"],
+        conversation["id"],
     )
 
     return {"status": "ok"}

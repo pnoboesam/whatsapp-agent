@@ -15,6 +15,9 @@ body = b'''{
             "changes": [
                 {
                     "value": {
+                        "metadata": {
+                            "phone_number_id": "-1069329939606586"
+                            },
                         "messages": [
                             {
                                 "id": "test-message-123",

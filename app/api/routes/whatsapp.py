@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 from app.agent import agent
 from app.services.whatsapp import send_message
+from app.services.db_businesses import get_business_by_phone_number_id
 
 from fastapi import APIRouter, Query, HTTPException, Request, status, BackgroundTasks
 
@@ -78,6 +79,7 @@ def extract_message(payload: dict):
             "wa_number": message["from"],
             "text": message["text"]["body"],
             "message_id": message["id"],
+            "phone_number_id": value["metadata"]["phone_number_id"],
         }
 
     except (KeyError, IndexError, TypeError):
@@ -119,9 +121,19 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
     if result is None:
         return {"status": "ignored"}
 
-    wa_number = result["wa_number"]
     text = result["text"]
+    wa_number = result["wa_number"]
     message_id = result["message_id"]
+    phone_number_id = result["phone_number_id"]
+
+    business = get_business_by_phone_number_id(phone_number_id)
+
+    if business is None:
+        logger.error(
+            "No business found for WhatsApp phone number ID %s",
+            phone_number_id,
+        )
+        return {"status": "ignored"}
 
     if message_id in processed_messages:
         logger.info(

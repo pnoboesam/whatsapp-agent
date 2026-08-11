@@ -27,4 +27,5 @@ dependencies = [
     "streamlit>=1.61.1",
     "fastapi[standard]>=0.141.1",
     "httpx>=0.28.1",
+    "supabase>=2.31.0",
 ]

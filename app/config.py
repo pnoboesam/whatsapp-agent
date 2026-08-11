@@ -14,6 +14,8 @@ REQUIRED_ENV_VARS = [
     "META_APP_SECRET",
     "OPENROUTER_API_KEY",
     "DATABASE_URL",
+    "SUPABASE_URL",
+    "SUPABASE_SERVICE_ROLE_KEY",
 ]
 
 def validate_environment():

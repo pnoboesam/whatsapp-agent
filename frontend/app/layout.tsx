@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
+import { Google_Sans } from "next/font/google";
 import "./globals.css";
+
+const font = Google_Sans({
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "WhatsApp AI Agent",
@@ -11,7 +16,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={font.className}>{children}</body>
     </html>
   );
 }

@@ -26,3 +26,26 @@ def get_or_create_conversation(business_id: str, contact_id: str, whatsapp_phone
     )
 
     return response.data[0]
+
+
+def update_conversation_after_message(
+    conversation_id: str,
+    message: str,
+    increment_unread: bool,
+):    
+    response = (
+        supabase
+        .rpc(
+            "update_conversation_after_message",
+            {
+                "p_conversation_id": conversation_id,
+                "p_message": message,
+                "p_increment_unread": increment_unread,
+            },
+        )
+        .execute()
+    )
+
+    return response
+
+

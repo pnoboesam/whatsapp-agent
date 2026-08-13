@@ -8,7 +8,10 @@ from app.agent import agent
 from app.services.whatsapp import send_message
 from app.services.db_businesses import get_business
 from app.services.db_contacts import get_or_create_contact
-from app.services.db_conversations import get_or_create_conversation
+from app.services.db_conversations import ( 
+    get_or_create_conversation, 
+    update_conversation_after_message,
+)
 from app.services.db_messages import create_message
 
 from fastapi import APIRouter, Query, HTTPException, Request, status, BackgroundTasks
@@ -75,6 +78,12 @@ async def process_message(
             sender_type="ai",
             status="sent",
             raw_payload=send_response,
+        )
+
+        update_conversation_after_message(
+            conversation_id=conversation_id,
+            message=response,
+            increment_unread=False,
         )
 
         logger.info(
@@ -191,7 +200,7 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
     )
 
     logger.info(
-        "Converastion resolved: business=%s contact=%s conversation=%s",
+        "Conversation resolved: business=%s contact=%s conversation=%s",
         business_id,
         contact["id"],
         conversation["id"]
@@ -216,7 +225,12 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
         )
         return {"status": "duplicate"}
 
-
+    update_conversation_after_message(
+        conversation_id=conversation["id"],
+        message=text,
+        increment_unread=True,
+    )
+    
     logger.info(
         "Message resolved: business=%s contact=%s conversation=%s whatsapp_message_id=%s",
         business_id,
@@ -236,4 +250,5 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
     )
 
     return {"status": "ok"}
+
 

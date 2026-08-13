@@ -49,3 +49,24 @@ def update_conversation_after_message(
     return response
 
 
+def mark_conversation_as_read(conversation_id: str):
+
+    supabase.rpc(
+        "mark_conversation_as_read",
+        {
+            "p_conversation_id": conversation_id,
+        },
+    ).execute()
+
+
+def set_conversation_ai_enabled(
+    conversation_id: str,
+    ai_enabled: bool,
+):
+    supabase.rpc(
+        "set_conversation_ai_enabled",
+        {
+            "p_conversation_id": conversation_id,
+            "p_ai_enabled": ai_enabled,
+        },
+    ).execute()

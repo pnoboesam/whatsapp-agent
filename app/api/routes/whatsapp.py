@@ -238,7 +238,9 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
         conversation["id"],
         message_id
     )
-        
+
+    if not conversation["ai_enabled"]:
+        return {"status": "human_handling"}        
      
     background_tasks.add_task(
         process_message,

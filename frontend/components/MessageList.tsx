@@ -18,12 +18,24 @@ export default function MessageList() {
       <MessageBubble
         sender="customer"
         message="Let's do tomorrow at 9pm."
+        time="2:32 PM"
+      />
+
+      <MessageBubble
+        sender="ai"
+        message="Great, tomorrow at 9pm is available. Please can I have your full name, phone number and location to book you in?"
+        time="2:32 PM"
+      />
+
+      <MessageBubble
+        sender="customer"
+        message="Kofi Doe, 0551234567, I am at Spintex"
         time="2:33 PM"
       />
 
       <MessageBubble
         sender="human"
-        message="Great, tomorrow at 9pm is available"
+        message="Appointment booked. Kindly let me know if you have any other questions."
         time="2:34 PM"
       />
     </div>

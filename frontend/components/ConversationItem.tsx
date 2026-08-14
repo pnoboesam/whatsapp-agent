@@ -15,7 +15,7 @@ export default function ConversationItem({
 }: ConversationItemProps) {
   return (
     // <div className="flex items-center justify-between border-b border-slate-100 p-4">
-    <div className="flex-col items-center justify-between border-b border-slate-200 p-4">
+    <div className="flex-col items-center justify-between border-b border-slate-200 p-4 hover:bg-slate-50 hover:border-r-2 hover:border-e-blue-600">
       <div className="min-w-0">
         <div className="flex items-center justify-between gap-3">
           <p className="font-medium">{name}</p>

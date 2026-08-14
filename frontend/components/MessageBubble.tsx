@@ -15,8 +15,8 @@ export default function MessageBubble({
       <div
         className={
           isCustomer
-            ? "max-w-md rounded-lg bg-white px-4 py-3 shadow-sm"
-            : "max-w-md rounded-lg bg-green-100 px-4 py-3 shadow-sm"
+            ? "max-w-md rounded-lg bg-white px-4 py-3 shadow-sm mr-6"
+            : "max-w-md rounded-lg bg-green-100 px-4 py-3 shadow-sm ml-6"
         }
       >
         <p className="mb-1 text-xs font-medium text-slate-500">

@@ -34,7 +34,7 @@ export default function ConversationList() {
       />
 
       <ConversationItem
-        name="Mary Smith"
+        name="Zipporah Oboe-Sam"
         lastMessage="Thank you so much"
         unreadCount={0}
         lastMessageAt="1:47 PM"

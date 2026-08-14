@@ -38,13 +38,15 @@ export default function ChatPanel({ conversationId }: ChatPanelProps) {
         </button>
       </header>
 
-      <MessageList messages={messages} />
-
-      {/* {conversationId ? (
-        <p>Selected conversation: {conversationId}</p>
+      {conversationId ? (
+        <MessageList messages={messages} />
       ) : (
-        <p>Select a conversation</p>
-      )} */}
+        <div className="flex flex-1 items-center justify-center">
+          <p className="text-sm bg-blue-50 text-blue-600 p-1 rounded-b-md">
+            Select a conversation to view messages
+          </p>
+        </div>
+      )}
 
       <MessageComposer />
     </section>

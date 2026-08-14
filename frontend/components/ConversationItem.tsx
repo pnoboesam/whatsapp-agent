@@ -12,7 +12,7 @@ export default function ConversationItem({
   return (
     <div
       onClick={onSelect}
-      className="flex-col items-center justify-between cursor-pointer border-b border-slate-200 p-4 hover:bg-blue-50 hover:border-2 hover:border-l-blue-600"
+      className="flex-col items-center justify-between cursor-pointer border-b border-slate-200 p-4 hover:bg-blue-50"
     >
       <div className="min-w-0">
         <div className="flex items-center justify-between gap-3">

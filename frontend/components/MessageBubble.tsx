@@ -1,15 +1,12 @@
+import type { Message } from "@/types/message";
+import { formatMessageTime } from "@/lib/formatDate";
+
 type MessageBubbleProps = {
-  message: string;
-  sender: "customer" | "ai" | "human";
-  time: string;
+  message: Message;
 };
 
-export default function MessageBubble({
-  message,
-  sender,
-  time,
-}: MessageBubbleProps) {
-  const isCustomer = sender === "customer";
+export default function MessageBubble({ message }: MessageBubbleProps) {
+  const isCustomer = message.sender_type === "customer";
   return (
     <div className={isCustomer ? "flex" : "flex justify-end"}>
       <div
@@ -20,16 +17,18 @@ export default function MessageBubble({
         }
       >
         <p className="mb-1 text-xs font-medium text-slate-500">
-          {sender === "customer"
+          {message.sender_type === "customer"
             ? "Customer"
-            : sender === "ai"
+            : message.sender_type === "ai"
               ? "AI"
               : "Human"}
         </p>
 
-        <p className="text-sm text-slate-800">{message}</p>
+        <p className="text-sm text-slate-800">{message.content}</p>
 
-        <p className="mt-1 text-right text-[11px] text-slate-400">{time}</p>
+        <p className="mt-1 text-right text-[11px] text-slate-400">
+          {formatMessageTime(message.created_at)}
+        </p>
       </div>
     </div>
   );

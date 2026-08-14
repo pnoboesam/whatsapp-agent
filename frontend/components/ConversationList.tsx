@@ -1,9 +1,30 @@
-import ConversationItem from "./ConversationItem";
+"use client";
 
-export default function ConversationList() {
+import ConversationItem from "./ConversationItem";
+import type { Conversation } from "@/types/conversation";
+import { useEffect, useState } from "react";
+import { getConversations } from "@/lib/api";
+
+type ConversationListProps = {
+  onSelectConversation: (conversationId: string) => void;
+};
+
+export default function ConversationList({
+  onSelectConversation,
+}: ConversationListProps) {
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+
+  useEffect(() => {
+    async function loadConversations() {
+      const data: Conversation[] = await getConversations();
+      setConversations(data);
+    }
+    loadConversations();
+  }, []);
+
   return (
-    <aside className="w-80 border-r border-slate-300 bg-white">
-      <div className="border-b border-slate-300 p-4">
+    <aside className="flex h-full min-h-0 flex-col w-80 border-r border-slate-300 bg-white">
+      <div className="border-b border-slate-300 px-4 pt-4">
         <h2 className="font-semibold">Conversations</h2>
 
         <input
@@ -25,21 +46,15 @@ export default function ConversationList() {
         </div>
       </div>
 
-      <ConversationItem
-        name="Kofi Doe"
-        lastMessage="Let's do tomorrow at 9pm."
-        lastMessageAt="2:34 PM"
-        unreadCount={2}
-        aiEnabled={true}
-      />
-
-      <ConversationItem
-        name="Zipporah Oboe-Sam"
-        lastMessage="Thank you so much"
-        unreadCount={0}
-        lastMessageAt="1:47 PM"
-        aiEnabled={false}
-      />
+      <div className="min-h-0 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300">
+        {conversations.map((conversation) => (
+          <ConversationItem
+            key={conversation.id}
+            conversation={conversation}
+            onSelect={() => onSelectConversation(conversation.id)}
+          />
+        ))}
+      </div>
     </aside>
   );
 }

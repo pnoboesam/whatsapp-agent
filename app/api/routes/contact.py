@@ -4,7 +4,7 @@ from app.db.client import supabase
 
 router = APIRouter(prefix="/api/v1/contacts", tags=["contacts"])
 
-@router.get("/contacts/{contact_id}")
+@router.get("/{contact_id}")
 async def get_contact_by_id(contact_id: str):
     response = (
         supabase

@@ -4,12 +4,10 @@ import type { Message } from "@/types/message";
 
 type MessageComposerProps = {
   conversationId: string | null;
-  onMessageSent: (message: Message) => void;
 };
 
 export default function MessageComposer({
   conversationId,
-  onMessageSent,
 }: MessageComposerProps) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -28,7 +26,6 @@ export default function MessageComposer({
 
     try {
       const sentMessage = await sendHumanMessage(conversationId, messageToSend);
-      onMessageSent(sentMessage);
     } catch {
       setMessage(messageToSend);
       setError("Failed to send message. Please try again.");

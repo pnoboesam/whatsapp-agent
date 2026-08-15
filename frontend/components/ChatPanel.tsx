@@ -2,6 +2,7 @@ import MessageList from "@/components/MessageList";
 import MessageComposer from "./MessageComposer";
 import { getMessages } from "@/lib/api";
 import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import type { Message } from "@/types/message";
 
 type ChatPanelProps = {
@@ -11,10 +12,7 @@ type ChatPanelProps = {
 export default function ChatPanel({ conversationId }: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
 
-  function handleMessageSent(message: Message) {
-    setMessages((currentMessages) => [...currentMessages, message]);
-  }
-
+  // Fetch existing messages by conversation Id
   useEffect(() => {
     if (!conversationId) {
       setMessages([]);
@@ -27,6 +25,45 @@ export default function ChatPanel({ conversationId }: ChatPanelProps) {
     }
 
     loadMessages(conversationId);
+  }, [conversationId]);
+
+  // Listen for new messages
+  useEffect(() => {
+    if (!conversationId) {
+      return;
+    }
+
+    const channel = supabase
+      .channel(`conversation-${conversationId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const newMessage = payload.new as Message;
+
+          setMessages((currentMessages) => {
+            if (
+              currentMessages.some((message) => message.id === newMessage.id)
+            ) {
+              return currentMessages;
+            }
+
+            return [...currentMessages, newMessage];
+          });
+        },
+      )
+      .subscribe((status) => {
+        console.log("Realtime status:", status);
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [conversationId]);
 
   return (
@@ -52,10 +89,7 @@ export default function ChatPanel({ conversationId }: ChatPanelProps) {
         </div>
       )}
 
-      <MessageComposer
-        conversationId={conversationId}
-        onMessageSent={handleMessageSent}
-      />
+      <MessageComposer conversationId={conversationId} />
     </section>
   );
 }

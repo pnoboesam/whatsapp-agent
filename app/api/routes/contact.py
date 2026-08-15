@@ -1,7 +1,6 @@
 from fastapi  import APIRouter
 
 from app.db.client import supabase
-from app.services.db_contacts import get_contact_by_id
 
 router = APIRouter(prefix="/api/v1/contacts", tags=["contacts"])
 

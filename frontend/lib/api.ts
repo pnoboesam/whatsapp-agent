@@ -15,7 +15,7 @@ export async function getConversations(): Promise<Conversation[]> {
 }
 
 
-export async function get_contact(contactId: string) {
+export async function getContact(contactId: string) {
     const response = await fetch(`${API_URL}/api/v1/contacts/${contactId}`)
 
     if (!response.ok) {

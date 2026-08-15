@@ -1,5 +1,9 @@
 import type { Conversation } from "@/types/conversation";
+import type { Contact } from "@/types/contact";
 import { formatMessageTime } from "@/lib/formatDate";
+import { useEffect, useState } from "react";
+import { getContact } from "@/lib/api";
+
 type ConversationItemProps = {
   conversation: Conversation;
   onSelect: () => void;
@@ -9,6 +13,17 @@ export default function ConversationItem({
   conversation,
   onSelect,
 }: ConversationItemProps) {
+  const [contact, setContact] = useState<Contact | null>(null);
+
+  useEffect(() => {
+    async function loadContact() {
+      const data = await getContact(conversation.contact_id);
+      setContact(data);
+    }
+
+    loadContact();
+  }, [conversation.contact_id]);
+
   return (
     <div
       onClick={onSelect}
@@ -16,7 +31,9 @@ export default function ConversationItem({
     >
       <div className="min-w-0">
         <div className="flex items-center justify-between gap-3">
-          <p className="font-medium">{conversation.whatsapp_phone}</p>
+          <p className="font-medium">
+            {contact?.f_name ?? contact?.whatsapp_phone}
+          </p>
 
           <span className="shrink-0 text-xs text-slate-400">
             {formatMessageTime(conversation.last_message_at)}

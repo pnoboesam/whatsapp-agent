@@ -64,7 +64,7 @@ async def send_human_message(conversation_id: str, request: HumanMessageRequest)
 
     outbound_message_id = send_response["messages"][0]["id"]
 
-    create_message(
+    created_message = create_message(
         business_id=conversation["business_id"],
         contact_id=conversation["contact_id"],
         conversation_id=conversation_id,
@@ -91,7 +91,7 @@ async def send_human_message(conversation_id: str, request: HumanMessageRequest)
         outbound_message_id,
     )
 
-    return {"status": "ok"}
+    return created_message
 
 
 @router.patch("/{conversation_id}/read")

@@ -4,22 +4,78 @@ import ConversationItem from "./ConversationItem";
 import type { Conversation } from "@/types/conversation";
 import { useEffect, useState } from "react";
 import { getConversations } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 
 type ConversationListProps = {
   onSelectConversation: (conversationId: string) => void;
 };
+
+function getTimestamp(value: string | null) {
+  return value ? new Date(value).getTime() : 0;
+}
 
 export default function ConversationList({
   onSelectConversation,
 }: ConversationListProps) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
 
+  // load all business conversations
   useEffect(() => {
     async function loadConversations() {
       const data: Conversation[] = await getConversations();
       setConversations(data);
     }
     loadConversations();
+  }, []);
+
+  // listen for new conversation updates
+  useEffect(() => {
+    async function testSupabaseAccess() {
+      const { data, error } = await supabase
+        .from("conversations")
+        .select("id")
+        .limit(1);
+
+      console.log("Conversations SELECT test:", { data, error });
+    }
+
+    testSupabaseAccess();
+
+    const channel = supabase
+      .channel("conversations-list")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "conversations",
+        },
+        (payload) => {
+          console.log("CONVERSATION UPDATE RECEIVED:", payload);
+
+          const updatedConversation = payload.new as Conversation;
+
+          setConversations((currentConversations) => {
+            return currentConversations
+              .map((conversation) =>
+                conversation.id === updatedConversation.id
+                  ? updatedConversation
+                  : conversation,
+              )
+              .sort(
+                (a, b) =>
+                  getTimestamp(b.last_message_at) -
+                  getTimestamp(a.last_message_at),
+              );
+          });
+        },
+      )
+      .subscribe((status) => {
+        console.log("Conversation Realtime: ", status);
+      });
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (

@@ -11,6 +11,10 @@ type ChatPanelProps = {
 export default function ChatPanel({ conversationId }: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
 
+  function handleMessageSent(message: Message) {
+    setMessages((currentMessages) => [...currentMessages, message]);
+  }
+
   useEffect(() => {
     if (!conversationId) {
       setMessages([]);
@@ -48,7 +52,10 @@ export default function ChatPanel({ conversationId }: ChatPanelProps) {
         </div>
       )}
 
-      <MessageComposer />
+      <MessageComposer
+        conversationId={conversationId}
+        onMessageSent={handleMessageSent}
+      />
     </section>
   );
 }

@@ -26,3 +26,24 @@ export async function getMessages(conversationId: string) {
 
     return response.json();
 }
+
+// This API allows a human within the business to send a message to the customer
+export async function sendHumanMessage(conversationId: string, message: string){
+    const response = await fetch(`${API_URL}/api/v1/conversations/${conversationId}/messages`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body:JSON.stringify({
+                human_message:message,
+            }),
+        }
+    )
+
+    if (!response.ok){
+            throw new Error("Failed to send message")
+        }
+
+    return response.json()
+}

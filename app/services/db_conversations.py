@@ -40,9 +40,6 @@ def get_conversation_by_id(conversation_id: str):
 
     return response.data
 
-if __name__ == "__main__":
-    response = get_conversation_by_id("86d28950-6ee7-4d28-bb70-48bc343655f7")
-    print(response)
 
 def update_conversation_after_message(
     conversation_id: str,

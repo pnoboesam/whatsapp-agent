@@ -15,6 +15,16 @@ export async function getConversations(): Promise<Conversation[]> {
 }
 
 
+export async function get_contact(contactId: string) {
+    const response = await fetch(`${API_URL}/api/v1/contacts/${contactId}`)
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch contact");
+    }
+
+    return response.json()
+}
+
 export async function getMessages(conversationId: string) {
     const response = await fetch(
         `${API_URL}/api/v1/conversations/${conversationId}/messages`,

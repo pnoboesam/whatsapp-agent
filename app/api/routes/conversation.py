@@ -1,8 +1,9 @@
 import logging
 
-from app.db.client import supabase
+from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException
 
+from app.db.client import supabase
 from app.services.db_conversations import (
     get_conversation_by_id,
     mark_conversation_as_read,
@@ -14,6 +15,9 @@ from app.services.whatsapp import send_message
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/conversations", tags=["conversations"])
+
+class HumanMessageRequest(BaseModel):
+    human_message: str
 
 @router.get("")
 def get_conversations():
@@ -43,8 +47,9 @@ def get_conversation_messages(conversation_id: str):
 
 
 @router.post("/{conversation_id}/messages")
-async def send_human_message(conversation_id: str, human_message: str):
+async def send_human_message(conversation_id: str, request: HumanMessageRequest):
     conversation = get_conversation_by_id(conversation_id)
+    human_message = request.human_message
 
     if not conversation:
         raise HTTPException(

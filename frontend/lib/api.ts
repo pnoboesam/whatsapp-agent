@@ -3,8 +3,25 @@ import type { Conversation } from "@/types/conversation";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 
-export async function getConversations(): Promise<Conversation[]> {
-    const response = await fetch(`${API_URL}/api/v1/conversations`);
+export async function getConversations({
+    aiEnabled = null,
+    unread = null,
+}: {
+    aiEnabled?: boolean | null;
+    unread?: boolean | null;
+} ={}): Promise<Conversation[]> {
+
+    const params = new URLSearchParams();
+
+    if (aiEnabled !== null) {
+        params.set("ai_enabled", aiEnabled.toString());
+    }
+
+    if (unread !== null) {
+        params.set("unread", unread.toString());
+    }
+
+    const response = await fetch(`${API_URL}/api/v1/conversations?${params.toString()}`);
 
     if (!response.ok) {
         throw new Error("Failed to fetch conversations");

@@ -30,7 +30,7 @@ def get_conversations(ai_enabled: bool | None = None, unread: bool | None = None
     if ai_enabled is not None:
         query = query.eq("ai_enabled", ai_enabled)
 
-    if unread is True:
+    if unread:
         query = query.gt("unread_count", 0)
 
     response = (

@@ -21,19 +21,38 @@ export default function ConversationList({
 }: ConversationListProps) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<"all" | "unread" | "ai" | "human">(
+    "human",
+  );
 
+  console.log("Current filter:", filter);
   // load all business conversations
   useEffect(() => {
     async function loadConversations() {
+      setLoading(true);
+
       try {
-        const data: Conversation[] = await getConversations();
+        let data: Conversation[];
+
+        if (filter === "all") {
+          data = await getConversations();
+        } else if (filter === "unread") {
+          data = await getConversations({ unread: true });
+        } else if (filter === "ai") {
+          data = await getConversations({ aiEnabled: true });
+        } else {
+          data = await getConversations({ aiEnabled: false });
+        }
+        console.log("FILTER:", filter);
+        console.log("RESULT:", data);
         setConversations(data);
       } finally {
         setLoading(false);
       }
     }
+
     loadConversations();
-  }, []);
+  }, [filter]);
 
   // listen for new conversation updates
   useEffect(() => {
@@ -48,7 +67,11 @@ export default function ConversationList({
         },
         async (payload) => {
           const updatedConversation = payload.new as Conversation;
-          console.log(updatedConversation);
+          const matchesFilter =
+            filter === "all" ||
+            (filter === "unread" && updatedConversation.unread_count > 0) ||
+            (filter === "ai" && updatedConversation.ai_enabled) ||
+            (filter === "human" && !updatedConversation.ai_enabled);
           const isCurrentlyOpen = updatedConversation.id === conversationId;
 
           if (isCurrentlyOpen && updatedConversation.unread_count > 0) {
@@ -57,6 +80,16 @@ export default function ConversationList({
             } catch (error) {
               console.error("Failed to mark conversation as read:", error);
             }
+          }
+
+          if (!matchesFilter) {
+            setConversations((currentConversations) =>
+              currentConversations.filter(
+                (conversation) => conversation.id !== updatedConversation.id,
+              ),
+            );
+
+            return;
           }
 
           setConversations((currentConversations) => {
@@ -88,29 +121,63 @@ export default function ConversationList({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [conversationId]);
+  }, [conversationId, filter]);
 
   return (
     <aside className="flex h-full min-h-0 flex-col w-80 border-r border-slate-300 bg-white">
       <div className="border-b border-slate-300 px-4 pt-4">
         <h2 className="font-semibold">Conversations</h2>
 
-        <input
+        {/* <input
           type="text"
           placeholder="Search conversations..."
           className="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-600"
-        />
+        /> */}
 
         <div className="mt-4 flex gap-4 justify-around text-sm">
-          <button className="border-b-2 border-blue-600 pb-2 font-medium text-blue-600">
+          <button
+            onClick={() => setFilter("all")}
+            className={`cursor-pointer pb-2 ${
+              filter === "all"
+                ? "border-b-2 border-blue-600 font-medium text-blue-600"
+                : "text-slate-500 hover:text-blue-600"
+            }`}
+          >
             All
           </button>
 
-          <button className="pb-2 text-slate-500">Unread</button>
+          <button
+            onClick={() => setFilter("unread")}
+            className={`cursor-pointer pb-2 ${
+              filter === "unread"
+                ? "border-b-2 border-blue-600 font-medium text-blue-600"
+                : "text-slate-500 hover:text-blue-600"
+            }`}
+          >
+            Unread
+          </button>
 
-          <button className="pb-2 text-slate-500">AI</button>
+          <button
+            onClick={() => setFilter("ai")}
+            className={`cursor-pointer pb-2 ${
+              filter === "ai"
+                ? "border-b-2 border-blue-600 font-medium text-blue-600"
+                : "text-slate-500 hover:text-blue-600"
+            }`}
+          >
+            AI
+          </button>
 
-          <button className="pb-2 text-slate-500">Human</button>
+          <button
+            onClick={() => setFilter("human")}
+            className={`cursor-pointer pb-2 ${
+              filter === "human"
+                ? "border-b-2 border-blue-600 font-medium text-blue-600"
+                : "text-slate-500 hover:text-blue-600"
+            }`}
+          >
+            Human
+          </button>
         </div>
       </div>
 

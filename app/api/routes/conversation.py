@@ -32,6 +32,20 @@ def get_conversations():
     return response.data
 
 
+@router.get("/{conversation_id}")
+def get_conversation(conversation_id):
+    response = (
+        supabase
+        .table("conversations")
+        .select("*")
+        .eq("id", conversation_id)
+        .maybe_single()
+        .execute()
+    )
+
+    return response.data
+
+
 @router.get("/{conversation_id}/messages")
 def get_conversation_messages(conversation_id: str):
     response = (

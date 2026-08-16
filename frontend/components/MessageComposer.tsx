@@ -25,7 +25,7 @@ export default function MessageComposer({
     setIsSending(true);
 
     try {
-      const sentMessage = await sendHumanMessage(conversationId, messageToSend);
+      await sendHumanMessage(conversationId, messageToSend);
     } catch {
       setMessage(messageToSend);
       setError("Failed to send message. Please try again.");

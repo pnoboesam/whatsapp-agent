@@ -3,10 +3,11 @@
 import ConversationItem from "./ConversationItem";
 import type { Conversation } from "@/types/conversation";
 import { useEffect, useState } from "react";
-import { getConversations } from "@/lib/api";
+import { getConversations, markAsRead } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 
 type ConversationListProps = {
+  conversationId: string | null;
   onSelectConversation: (conversationId: string) => void;
 };
 
@@ -15,32 +16,27 @@ function getTimestamp(value: string | null) {
 }
 
 export default function ConversationList({
+  conversationId,
   onSelectConversation,
 }: ConversationListProps) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // load all business conversations
   useEffect(() => {
     async function loadConversations() {
-      const data: Conversation[] = await getConversations();
-      setConversations(data);
+      try {
+        const data: Conversation[] = await getConversations();
+        setConversations(data);
+      } finally {
+        setLoading(false);
+      }
     }
     loadConversations();
   }, []);
 
   // listen for new conversation updates
   useEffect(() => {
-    async function testSupabaseAccess() {
-      const { data, error } = await supabase
-        .from("conversations")
-        .select("id")
-        .limit(1);
-
-      console.log("Conversations SELECT test:", { data, error });
-    }
-
-    testSupabaseAccess();
-
     const channel = supabase
       .channel("conversations-list")
       .on(
@@ -50,18 +46,34 @@ export default function ConversationList({
           schema: "public",
           table: "conversations",
         },
-        (payload) => {
-          console.log("CONVERSATION UPDATE RECEIVED:", payload);
-
+        async (payload) => {
           const updatedConversation = payload.new as Conversation;
+          console.log(updatedConversation);
+          const isCurrentlyOpen = updatedConversation.id === conversationId;
+
+          if (isCurrentlyOpen && updatedConversation.unread_count > 0) {
+            try {
+              await markAsRead(conversationId);
+            } catch (error) {
+              console.error("Failed to mark conversation as read:", error);
+            }
+          }
 
           setConversations((currentConversations) => {
             return currentConversations
-              .map((conversation) =>
-                conversation.id === updatedConversation.id
-                  ? updatedConversation
-                  : conversation,
-              )
+              .map((conversation) => {
+                if (conversation.id !== updatedConversation.id) {
+                  return conversation;
+                }
+
+                return {
+                  ...updatedConversation,
+
+                  unread_count: isCurrentlyOpen
+                    ? 0
+                    : updatedConversation.unread_count,
+                };
+              })
               .sort(
                 (a, b) =>
                   getTimestamp(b.last_message_at) -
@@ -76,7 +88,7 @@ export default function ConversationList({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [conversationId]);
 
   return (
     <aside className="flex h-full min-h-0 flex-col w-80 border-r border-slate-300 bg-white">
@@ -103,13 +115,21 @@ export default function ConversationList({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300">
-        {conversations.map((conversation) => (
-          <ConversationItem
-            key={conversation.id}
-            conversation={conversation}
-            onSelect={() => onSelectConversation(conversation.id)}
-          />
-        ))}
+        {loading ? (
+          <div className="flex mt-10 items-center justify-center">
+            <p className="text-sm bg-blue-50 text-blue-600 p-1 rounded-b-md">
+              Loading Conversations...
+            </p>
+          </div>
+        ) : (
+          conversations.map((conversation) => (
+            <ConversationItem
+              key={conversation.id}
+              conversation={conversation}
+              onSelect={() => onSelectConversation(conversation.id)}
+            />
+          ))
+        )}
       </div>
     </aside>
   );

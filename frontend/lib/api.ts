@@ -15,6 +15,18 @@ export async function getConversations(): Promise<Conversation[]> {
 }
 
 
+export async function getConversation(conversationId:string): Promise<Conversation> {
+    const response = await fetch(`${API_URL}/api/v1/conversations/${conversationId}`);
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch conversation");
+    }
+
+    const data: Conversation = await response.json();
+    return data;
+}
+
+
 export async function getContact(contactId: string) {
     const response = await fetch(`${API_URL}/api/v1/contacts/${contactId}`)
 
@@ -24,6 +36,7 @@ export async function getContact(contactId: string) {
 
     return response.json()
 }
+
 
 export async function getMessages(conversationId: string) {
     const response = await fetch(
@@ -36,6 +49,39 @@ export async function getMessages(conversationId: string) {
 
     return response.json();
 }
+
+
+export async function toggleAI(conversationId: string, aiEnabled: boolean) {
+    const response = await fetch(
+        `${API_URL}/api/v1/conversations/${conversationId}/ai?ai_enabled=${aiEnabled}`,
+        {
+            method: "PATCH",
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to switch agent state");
+    }
+
+    return response.json();
+}
+
+
+export async function markAsRead(conversationId: string) {
+    const response = await fetch(
+        `${API_URL}/api/v1/conversations/${conversationId}/read`,
+        {
+            method: "PATCH",
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to mark conversation as read");
+    }
+
+    return response.json();
+}
+
 
 // This API allows a human within the business to send a message to the customer
 export async function sendHumanMessage(conversationId: string, message: string){

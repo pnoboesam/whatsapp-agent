@@ -18,7 +18,10 @@ export default function Home() {
       <Header />
 
       <div className="flex flex-1 min-h-0">
-        <ConversationList onSelectConversation={setSelectedConversationId} />
+        <ConversationList
+          conversationId={selectedConversationId}
+          onSelectConversation={setSelectedConversationId}
+        />
         <ChatPanel conversationId={selectedConversationId} />
       </div>
     </main>

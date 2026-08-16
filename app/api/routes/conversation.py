@@ -20,11 +20,21 @@ class HumanMessageRequest(BaseModel):
     human_message: str
 
 @router.get("")
-def get_conversations():
-    response = (
+def get_conversations(ai_enabled: bool | None = None, unread: bool | None = None):
+    query = (
         supabase
         .table("conversations")
         .select("*")
+    )
+
+    if ai_enabled is not None:
+        query = query.eq("ai_enabled", ai_enabled)
+
+    if unread is True:
+        query = query.gt("unread_count", 0)
+
+    response = (
+        query 
         .order("last_message_at", desc=True)
         .execute()
     )

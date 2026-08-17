@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { sendHumanMessage } from "@/lib/api";
-import type { Message } from "@/types/message";
 
 type MessageComposerProps = {
   conversationId: string | null;

@@ -26,7 +26,9 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
               : "Human"}
         </p>
 
-        <p className="break-words text-sm text-slate-800">{message.content}</p>
+        <p className="wrap-break-word text-sm text-slate-800">
+          {message.content}
+        </p>
 
         <p className="mt-1 text-right text-[11px] text-slate-400">
           {formatMessageTime(message.created_at)}

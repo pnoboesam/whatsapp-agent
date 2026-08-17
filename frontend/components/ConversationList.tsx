@@ -137,8 +137,6 @@ export default function ConversationList({
         },
       )
       .subscribe((status) => {
-        console.log("Conversation Realtime:", status);
-
         if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
           setRealtimeError(
             "Live updates are currently unavailable. Please refresh the page.",

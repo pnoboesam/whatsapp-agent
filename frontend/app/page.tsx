@@ -11,8 +11,6 @@ export default function Home() {
     string | null
   >(null);
 
-  console.log(selectedConversationId);
-
   return (
     <main className="flex h-dvh flex-col">
       <Header />

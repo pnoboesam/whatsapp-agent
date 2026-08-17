@@ -42,16 +42,9 @@ export default function ChatPanel({ conversationId, onBack }: ChatPanelProps) {
     }
   }
 
-  // Reset AI error when switching conversations
-  useEffect(() => {
-    setAiError(null);
-  }, [conversationId]);
-
   // Fetch existing messages by conversation Id
   useEffect(() => {
     if (!conversationId) {
-      setMessages([]);
-      setContact(null);
       return;
     }
 
@@ -104,6 +97,8 @@ export default function ChatPanel({ conversationId, onBack }: ChatPanelProps) {
     let cancelled = false;
 
     async function loadAIState(conversationId: string) {
+      setAiError(null);
+
       try {
         const data = await getConversation(conversationId);
 

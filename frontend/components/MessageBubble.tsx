@@ -8,13 +8,15 @@ type MessageBubbleProps = {
 export default function MessageBubble({ message }: MessageBubbleProps) {
   const isCustomer = message.sender_type === "customer";
   return (
-    <div className={isCustomer ? "flex" : "flex justify-end"}>
+    <div
+      className={`flex w-full ${isCustomer ? "justify-start" : "justify-end"}`}
+    >
       <div
-        className={
+        className={`w-[85%] max-w-md px-4 py-3 shadow-sm ${
           isCustomer
-            ? "max-w-md rounded-tr-xl rounded-b-xl bg-white px-4 py-3 shadow-sm mr-6"
-            : "max-w-md rounded-tl-xl rounded-b-xl bg-green-100 px-4 py-3 shadow-sm ml-6"
-        }
+            ? "rounded-tr-xl rounded-b-xl bg-white"
+            : "rounded-tl-xl rounded-b-xl bg-green-100"
+        }`}
       >
         <p className="mb-1 text-xs font-medium text-slate-500">
           {message.sender_type === "customer"
@@ -24,7 +26,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
               : "Human"}
         </p>
 
-        <p className="text-sm text-slate-800">{message.content}</p>
+        <p className="break-words text-sm text-slate-800">{message.content}</p>
 
         <p className="mt-1 text-right text-[11px] text-slate-400">
           {formatMessageTime(message.created_at)}

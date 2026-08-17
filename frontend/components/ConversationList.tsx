@@ -155,7 +155,7 @@ export default function ConversationList({
   }, [conversationId, filter]);
 
   return (
-    <aside className="flex h-full min-h-0 flex-col w-80 border-r border-slate-300 bg-white">
+    <aside className="flex h-full min-h-0 flex-col w-full border-r border-slate-300 bg-white md:w-80">
       <div className="border-b border-slate-300 px-4 pt-4">
         <h2 className="font-semibold">Conversations</h2>
 

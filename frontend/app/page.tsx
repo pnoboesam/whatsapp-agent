@@ -14,15 +14,31 @@ export default function Home() {
   console.log(selectedConversationId);
 
   return (
-    <main className="flex h-screen flex-col">
+    <main className="flex h-dvh flex-col">
       <Header />
 
       <div className="flex flex-1 min-h-0">
-        <ConversationList
-          conversationId={selectedConversationId}
-          onSelectConversation={setSelectedConversationId}
-        />
-        <ChatPanel conversationId={selectedConversationId} />
+        <div
+          className={`w-full md:flex md:w-80 ${
+            selectedConversationId ? "hidden" : "flex"
+          }`}
+        >
+          <ConversationList
+            conversationId={selectedConversationId}
+            onSelectConversation={setSelectedConversationId}
+          />
+        </div>
+
+        <div
+          className={`w-full ${
+            selectedConversationId ? "flex" : "hidden"
+          } md:flex`}
+        >
+          <ChatPanel
+            conversationId={selectedConversationId}
+            onBack={() => setSelectedConversationId(null)}
+          />
+        </div>
       </div>
     </main>
   );

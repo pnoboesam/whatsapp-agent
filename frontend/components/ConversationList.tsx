@@ -22,7 +22,7 @@ export default function ConversationList({
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "unread" | "ai" | "human">(
-    "human",
+    "all",
   );
 
   console.log("Current filter:", filter);
@@ -67,12 +67,17 @@ export default function ConversationList({
         },
         async (payload) => {
           const updatedConversation = payload.new as Conversation;
+          const isCurrentlyOpen = updatedConversation.id === conversationId;
+
+          const unreadCount = isCurrentlyOpen
+            ? 0
+            : updatedConversation.unread_count;
+
           const matchesFilter =
             filter === "all" ||
-            (filter === "unread" && updatedConversation.unread_count > 0) ||
+            (filter === "unread" && unreadCount > 0) ||
             (filter === "ai" && updatedConversation.ai_enabled) ||
             (filter === "human" && !updatedConversation.ai_enabled);
-          const isCurrentlyOpen = updatedConversation.id === conversationId;
 
           if (isCurrentlyOpen && updatedConversation.unread_count > 0) {
             try {
@@ -93,25 +98,39 @@ export default function ConversationList({
           }
 
           setConversations((currentConversations) => {
-            return currentConversations
-              .map((conversation) => {
-                if (conversation.id !== updatedConversation.id) {
-                  return conversation;
-                }
+            const updatedConversationWithUnreadCount = {
+              ...updatedConversation,
+              unread_count: isCurrentlyOpen
+                ? 0
+                : updatedConversation.unread_count,
+            };
 
-                return {
-                  ...updatedConversation,
+            const conversationExists = currentConversations.some(
+              (conversation) => conversation.id === updatedConversation.id,
+            );
 
-                  unread_count: isCurrentlyOpen
-                    ? 0
-                    : updatedConversation.unread_count,
-                };
-              })
-              .sort(
-                (a, b) =>
-                  getTimestamp(b.last_message_at) -
-                  getTimestamp(a.last_message_at),
-              );
+            if (conversationExists) {
+              return currentConversations
+                .map((conversation) =>
+                  conversation.id === updatedConversation.id
+                    ? updatedConversationWithUnreadCount
+                    : conversation,
+                )
+                .sort(
+                  (a, b) =>
+                    getTimestamp(b.last_message_at) -
+                    getTimestamp(a.last_message_at),
+                );
+            }
+
+            return [
+              ...currentConversations,
+              updatedConversationWithUnreadCount,
+            ].sort(
+              (a, b) =>
+                getTimestamp(b.last_message_at) -
+                getTimestamp(a.last_message_at),
+            );
           });
         },
       )

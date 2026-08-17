@@ -22,6 +22,7 @@ export default function ConversationList({
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [realtimeError, setRealtimeError] = useState("");
   const [filter, setFilter] = useState<"all" | "unread" | "ai" | "human">(
     "all",
   );
@@ -135,7 +136,19 @@ export default function ConversationList({
           });
         },
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Conversation Realtime:", status);
+
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          setRealtimeError(
+            "Live updates are currently unavailable. Please refresh the page.",
+          );
+        }
+
+        if (status === "SUBSCRIBED") {
+          setRealtimeError("");
+        }
+      });
     return () => {
       supabase.removeChannel(channel);
     };
@@ -145,12 +158,6 @@ export default function ConversationList({
     <aside className="flex h-full min-h-0 flex-col w-80 border-r border-slate-300 bg-white">
       <div className="border-b border-slate-300 px-4 pt-4">
         <h2 className="font-semibold">Conversations</h2>
-
-        {/* <input
-          type="text"
-          placeholder="Search conversations..."
-          className="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-600"
-        /> */}
 
         <div className="mt-4 flex gap-4 justify-around text-sm">
           <button
@@ -198,6 +205,12 @@ export default function ConversationList({
           </button>
         </div>
       </div>
+
+      {realtimeError && (
+        <div className="border-b border-amber-200 bg-amber-50 px-3 py-2 text-center">
+          <p className="text-xs text-amber-700">{realtimeError}</p>
+        </div>
+      )}
 
       <div className="min-h-0 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300">
         {loading ? (

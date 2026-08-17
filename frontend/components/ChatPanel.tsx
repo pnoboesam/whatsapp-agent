@@ -20,52 +20,108 @@ export default function ChatPanel({ conversationId }: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [contact, setContact] = useState<Contact | null>(null);
   const [aiEnabled, setAiEnabled] = useState(true);
+  const [isTogglingAI, setIsTogglingAI] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   async function handleToggleAI() {
-    if (!conversationId) return;
+    if (!conversationId || isTogglingAI) return;
 
     const newState = !aiEnabled;
 
-    const data = await toggleAI(conversationId, newState);
+    setAiError(null);
+    setIsTogglingAI(true);
 
-    setAiEnabled(data.ai_enabled);
+    try {
+      const data = await toggleAI(conversationId, newState);
+      setAiEnabled(data.ai_enabled);
+    } catch {
+      setAiError("Failed to change AI state. Please try again.");
+    } finally {
+      setIsTogglingAI(false);
+    }
   }
+
+  // Reset AI error when switching conversations
+  useEffect(() => {
+    setAiError(null);
+  }, [conversationId]);
 
   // Fetch existing messages by conversation Id
   useEffect(() => {
     if (!conversationId) {
       setMessages([]);
+      setContact(null);
       return;
     }
 
-    async function loadMessages(conversationId: string) {
-      const data = await getMessages(conversationId);
-      setMessages(data);
+    let cancelled = false;
 
-      if (data.length > 0) {
-        const contact_data = await getContact(data[0].contact_id);
-        setContact(contact_data);
+    async function loadMessages(conversationId: string) {
+      try {
+        const data = await getMessages(conversationId);
+
+        if (cancelled) return;
+
+        setMessages(data);
+
+        if (data.length > 0) {
+          const contact_data = await getContact(data[0].contact_id);
+
+          if (cancelled) return;
+
+          setContact(contact_data);
+        } else {
+          setContact(null);
+        }
+      } catch (error) {
+        if (cancelled) return;
+
+        console.error("Failed to load conversation:", error);
       }
     }
 
     async function markConversationAsRead(conversationId: string) {
-      await markAsRead(conversationId);
+      try {
+        await markAsRead(conversationId);
+      } catch (error) {
+        console.error("Failed to mark conversation as read:", error);
+      }
     }
 
     loadMessages(conversationId);
     markConversationAsRead(conversationId);
+
+    return () => {
+      cancelled = true;
+    };
   }, [conversationId]);
 
   // Set AIState
   useEffect(() => {
     if (!conversationId) return;
 
+    let cancelled = false;
+
     async function loadAIState(conversationId: string) {
-      const data = await getConversation(conversationId);
-      setAiEnabled(data.ai_enabled);
+      try {
+        const data = await getConversation(conversationId);
+
+        if (cancelled) return;
+
+        setAiEnabled(data.ai_enabled);
+      } catch (error) {
+        if (cancelled) return;
+
+        console.error("Failed to load AI state:", error);
+        setAiError("Failed to load AI state. Please try again.");
+      }
     }
 
     loadAIState(conversationId);
+
+    return () => {
+      cancelled = true;
+    };
   }, [conversationId]);
 
   // Listen for new messages
@@ -98,9 +154,7 @@ export default function ChatPanel({ conversationId }: ChatPanelProps) {
           });
         },
       )
-      .subscribe((status) => {
-        console.log("Realtime status:", status);
-      });
+      .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
@@ -135,9 +189,10 @@ export default function ChatPanel({ conversationId }: ChatPanelProps) {
               <button
                 type="button"
                 onClick={handleToggleAI}
+                disabled={isTogglingAI}
                 className={`relative h-5 w-10 rounded-full transition-colors ${
                   aiEnabled ? "bg-blue-600" : "bg-slate-300"
-                }`}
+                } ${isTogglingAI ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
                 aria-pressed={aiEnabled}
               >
                 <span
@@ -148,6 +203,12 @@ export default function ChatPanel({ conversationId }: ChatPanelProps) {
               </button>
             </div>
           </header>
+
+          {aiError && (
+            <div className="border-b border-red-200 bg-red-50 px-3 py-2 text-center">
+              <p className="text-xs text-red-600">{aiError}</p>
+            </div>
+          )}
 
           <MessageList messages={messages} />
 

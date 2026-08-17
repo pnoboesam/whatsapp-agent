@@ -21,15 +21,16 @@ export default function ConversationList({
 }: ConversationListProps) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [filter, setFilter] = useState<"all" | "unread" | "ai" | "human">(
     "all",
   );
 
-  console.log("Current filter:", filter);
   // load all business conversations
   useEffect(() => {
     async function loadConversations() {
       setLoading(true);
+      setError("");
 
       try {
         let data: Conversation[];
@@ -43,9 +44,9 @@ export default function ConversationList({
         } else {
           data = await getConversations({ aiEnabled: false });
         }
-        console.log("FILTER:", filter);
-        console.log("RESULT:", data);
         setConversations(data);
+      } catch {
+        setError("Failed to load conversations");
       } finally {
         setLoading(false);
       }
@@ -134,9 +135,7 @@ export default function ConversationList({
           });
         },
       )
-      .subscribe((status) => {
-        console.log("Conversation Realtime: ", status);
-      });
+      .subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
@@ -206,6 +205,11 @@ export default function ConversationList({
             <p className="text-sm bg-blue-50 text-blue-600 p-1 rounded-b-md">
               Loading Conversations...
             </p>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col mt-10 items-center justify-center">
+            <p className="text-red-600">{error}</p>
+            <p className="text-sm text-slate-500">Please try again.</p>
           </div>
         ) : conversations.length === 0 ? (
           <div className="flex flex-col mt-10 items-center justify-center">

@@ -43,12 +43,18 @@ export default function MessageComposer({
       )}
 
       <div className="flex gap-3">
-        <input
-          type="text"
+        <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
           placeholder="Type a message..."
-          className="flex-1 rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-600"
+          rows={1}
+          className="flex-1 resize-none rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-600 scrollbar-thin scrollbar-thumb-slate-300"
         />
 
         <button

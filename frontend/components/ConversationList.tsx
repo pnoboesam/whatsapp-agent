@@ -207,6 +207,21 @@ export default function ConversationList({
               Loading Conversations...
             </p>
           </div>
+        ) : conversations.length === 0 ? (
+          <div className="flex flex-col mt-10 items-center justify-center">
+            <p>
+              {filter === "all" && "No Conversations."}
+              {filter === "unread" && "No Unread Conversations."}
+              {filter === "ai" && "No AI Conversations."}
+              {filter === "human" && "No Human Conversations."}
+            </p>
+
+            <p className="text-sm text-slate-500">
+              {filter === "unread"
+                ? "You're all caught up!"
+                : "Conversations will appear here."}
+            </p>
+          </div>
         ) : (
           conversations.map((conversation) => (
             <ConversationItem

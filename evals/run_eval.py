@@ -3,7 +3,8 @@ from langsmith import Client, evaluate
 from icecream import ic as print
 
 from app.agent.agent import chat
-from evals.rag_correctness_evaluator import rag_correctness
+from evals.rag_correctness_evaluator import category_aware_correctness
+from evals.behavioral_alignment_evaluator import behavioral_alignment
 
 load_dotenv()
 
@@ -28,7 +29,7 @@ if __name__ == "__main__":
     results = evaluate(
         target,
         data=DATASET_NAME,
-        evaluators=[rag_correctness],
+        evaluators=[category_aware_correctness, behavioral_alignment],
         experiment_prefix="wa-agent-v1",
     )
 

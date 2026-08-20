@@ -28,4 +28,5 @@ dependencies = [
     "fastapi[standard]>=0.141.1",
     "httpx>=0.28.1",
     "supabase>=2.31.0",
+    "langsmith>=0.10.15",
 ]

@@ -132,7 +132,7 @@ Return exactly one category and a brief explanation.
     result = structured_judge.invoke(prompt)
 
     return {
-        "key": "rag_correctness",
+        "key": "correctness",
         "value": result.category,
         "comment": result.explanation,
     }

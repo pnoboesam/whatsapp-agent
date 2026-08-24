@@ -1,12 +1,12 @@
 import uuid
+
 from dotenv import load_dotenv
 from langsmith import Client, evaluate
-from icecream import ic as print
 
 from app.agent.agent import chat
 from evals.correctness_evaluator import category_aware_correctness
 from evals.behavioral_alignment_evaluator import behavioral_alignment
-from evals.trace_evaluators import require_kb_search, lead_tool_usage
+from evals.trace_evaluators import require_kb_search
 
 load_dotenv()
 
@@ -15,7 +15,6 @@ DATASET_NAME = "wa-agent-v1"
 
 
 def target(inputs: dict) -> dict:
-    print(inputs)
     question = inputs["question"]
 
     answer = chat(
@@ -39,4 +38,7 @@ if __name__ == "__main__":
         experiment_prefix="wa-agent-v1",
     )
 
-    print(results)
+    print(f"\nExperiment name: {results.experiment_name}")
+    print(f"LangSmith URL: {results.url}")
+    print(f"EXPERIMENT_NAME={results.experiment_name}")
+

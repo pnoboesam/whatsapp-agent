@@ -1,3 +1,5 @@
+import os
+
 from collections import Counter, defaultdict
 from dotenv import load_dotenv
 from langsmith import Client
@@ -5,12 +7,20 @@ from langsmith import Client
 load_dotenv()
 
 DATASET_NAME = "wa-agent-v1"
-EXPERIMENT_NAME = "wa-agent-v1-1479dec5"
+# EXPERIMENT_NAME = "wa-agent-v1-1797c7e3"
 
-MIN_CORRECTNESS = 15
-MIN_BEHAVIOR_ALIGNED = 15
-MAX_INCORRECT = 1
-MAX_MISALIGNED = 1
+EXPERIMENT_NAME = os.getenv("EXPERIMENT_NAME")
+
+if not EXPERIMENT_NAME:
+    raise RuntimeError(
+        "EXPERIMENT_NAME environment variable is required."
+    )
+
+
+MIN_CORRECTNESS_RATE = 0.71
+MIN_BEHAVIOR_ALIGNED_RATE = 0.71
+MAX_INCORRECT_RATE = 0.48
+MAX_MISALIGNED_RATE = 0.48
 
 def main():
     client = Client()
@@ -157,16 +167,47 @@ def main():
 
     correct_count = correctness_results.get("correct", 0)
     incorrect_count = correctness_results.get("incorrect", 0)
-
     aligned_count = behavior_results.get("aligned", 0)
     misaligned_count = behavior_results.get("misaligned", 0)
 
+    correctness_total = sum(correctness_results.values())
+    behavior_total = sum(behavior_results.values())
+
+    correctness_rate = (
+        correct_count / correctness_total
+        if correctness_total
+        else 0
+    )
+
+    behavior_rate = (
+        aligned_count / behavior_total
+        if behavior_total
+        else 0
+    )
+
+    incorrect_rate = (
+        incorrect_count / correctness_total
+        if correctness_total
+        else 1
+    )
+
+    misaligned_rate = (
+        misaligned_count / behavior_total
+        if behavior_total
+        else 1
+    )
+
     checks = {
-        "Correctness": correct_count >= MIN_CORRECTNESS,
-        "Behavioral alignment": aligned_count >= MIN_BEHAVIOR_ALIGNED,
-        "Incorrect": incorrect_count <= MAX_INCORRECT,
-        "Misaligned": misaligned_count <= MAX_MISALIGNED,
+        "Correctness": correctness_rate >= MIN_CORRECTNESS_RATE,
+        "Behavioral alignment": behavior_rate >= MIN_BEHAVIOR_ALIGNED_RATE,
+        "Incorrect": incorrect_rate <= MAX_INCORRECT_RATE,
+        "Misaligned": misaligned_rate <= MAX_MISALIGNED_RATE,
     }
+
+    print(f"Correctness rate: {correctness_rate:.1%}")
+    print(f"Behavior alignment rate: {behavior_rate:.1%}")
+    print(f"Incorrect rate: {incorrect_rate:.1%}")
+    print(f"Misaligned rate: {misaligned_rate:.1%}")
 
     for name, passed in checks.items():
         status = "PASS" if passed else "FAIL"

@@ -1,13 +1,11 @@
 import uuid
 from dotenv import load_dotenv
-from langsmith import Client, evaluate
+from langsmith import evaluate
 
 from app.agent.agent import chat
 from evals.trace_evaluators import lead_tool_usage
 
 load_dotenv()
-
-client = Client()
 
 DATASET_NAME = "wa-agent-multiturn-v1"
 

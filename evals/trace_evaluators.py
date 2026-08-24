@@ -20,7 +20,7 @@ def require_kb_search(run, example):
 
     category = example.metadata.get("category", "")
 
-    #KB lookup is expected for these categories.
+
     if category not in {"rag", "no_answer"}:
         return {
             "key": "kb_search_required",
@@ -72,7 +72,7 @@ def lead_tool_usage(run, example):
         "append_lead_details",
     )
 
-    # Tool is not expected for this example.
+
     if not requires_lead_tool:
         return {
             "key": "lead_tool_usage",
@@ -83,7 +83,6 @@ def lead_tool_usage(run, example):
             ),
         }
 
-    # No lead tool call
     if not lead_tool_runs:
         return {
             "key": "lead_tool_usage",
@@ -91,7 +90,6 @@ def lead_tool_usage(run, example):
             "comment": "append_lead_details was required but not called.",
         }
 
-    # Tool should normally be called exactly once
     if len(lead_tool_runs) > 1:
         return {
             "key": "lead_tool_usage",

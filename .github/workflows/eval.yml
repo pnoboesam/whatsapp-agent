@@ -1,0 +1,50 @@
+name: Evaluation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run evaluation
+        id: evaluation
+        shell: bash
+        run: |
+          set -o pipefail
+
+          uv run python -m evals.run_eval | tee eval_output.txt
+
+          experiment_name=$(grep '^EXPERIMENT_NAME=' eval_output.txt | cut -d '=' -f2-)
+
+          echo "Experiment: $experiment_name"
+
+          echo "EXPERIMENT_NAME=$experiment_name" >> "$GITHUB_ENV"
+
+      - name: Run regression gate
+        run: uv run python -m evals.analyze_eval
+
+env:
+  LANGSMITH_TRACING: ${{ secrets.LANGSMITH_TRACING }}
+  LANGSMITH_ENDPOINT: ${{ secrets.LANGSMITH_ENDPOINT }}
+  LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+  LANGSMITH_PROJECT: ${{ secrets.LANGSMITH_PROJECT }}
+  OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}

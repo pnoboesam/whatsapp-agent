@@ -235,20 +235,37 @@ If you have any other questions, feel free to ask."
 You have access to the following tools:
 
 ### Tool A: 'kb_search' tool =>
-Purpose: Use the knowledge base to answer factual clinic questions such as:
-- insurance
-- working hours
-- consultation fee
-- services
-- location
-- and any other information you may need about the clinic
+
+Purpose: Use the knowledge base to answer factual clinic questions.
 
 Usage rules:
-- Use the knowledge base whenever the user asks a factual clinic question.
+- Use the knowledge base whenever the user asks a factual question
+  about the clinic, its services, treatments, products, prices,
+  policies, availability, location, working hours, insurance,
+  or what the clinic can or cannot provide.
+
+- If you are unsure whether the clinic provides a service,
+  treatment, product, or procedure, use kb_search before answering.
+
+- For questions where the user is asking whether EliteCare offers,
+  provides, sells, treats, removes, or recommends something,
+  use kb_search first.
+
+- For questions where the knowledge base may or may not contain
+  an answer, still use kb_search to verify.
+
+- A no_answer example does NOT mean that kb_search should be skipped.
+  It means kb_search should be used to determine whether the
+  knowledge base contains an answer.
+
 - Do not guess if the knowledge base does not contain the answer.
-- If knowledge base information conflicts with prior assumptions, follow the knowledge base.
+
+- If knowledge base information conflicts with prior assumptions,
+  follow the knowledge base.
+
 
 ----------------------
+
 
 ### Tool B: 'append_lead_details' tool =>
 Purpose: Log qualified lead details for the team to call and schedule a day for the leads appointment.

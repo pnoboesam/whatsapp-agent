@@ -1,0 +1,45 @@
+import uuid
+from dotenv import load_dotenv
+from langsmith import Client, evaluate
+
+from app.agent.agent import chat
+from evals.trace_evaluators import lead_tool_usage
+
+load_dotenv()
+
+client = Client()
+
+DATASET_NAME = "wa-agent-multiturn-v1"
+
+
+def target(inputs: dict) -> dict:
+    thread_id = f"eval-{uuid.uuid4()}"
+    messages = inputs["messages"]
+
+    responses = []
+
+    for message in messages:
+        response = chat(
+            thread_id=thread_id,
+            message=message,
+        )
+
+        responses.append(response)
+
+    return {
+        "responses": responses,
+        "answer": responses[-1],
+    }
+
+
+if __name__ == "__main__":
+    results = evaluate(
+        target,
+        data=DATASET_NAME,
+        evaluators=[
+            lead_tool_usage,
+        ],
+        experiment_prefix="wa-agent-multiturn",
+    )
+
+    print(results)

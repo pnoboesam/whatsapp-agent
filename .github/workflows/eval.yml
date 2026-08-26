@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   evaluate:
     runs-on: ubuntu-latest
@@ -64,6 +68,58 @@ jobs:
           set -o pipefail
 
           uv run python -m evals.analyze_multiturn_eval | tee multiturn_regression_output.txt
+
+      - name: Post evaluation results to PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+
+            const singleTurnOutput = fs.existsSync("single_regression_output.txt")
+              ? fs.readFileSync("single_regression_output.txt", "utf8")
+              : "No single-turn regression output found.";
+
+            const multiTurnOutput = fs.existsSync("multiturn_regression_output.txt")
+              ? fs.readFileSync("multiturn_regression_output.txt", "utf8")
+              : "No multi-turn regression output found.";
+
+            const singleTurnStatus =
+              "${{ steps.single_turn_gate.outcome }}" === "success"
+                ? "✅ PASSED"
+                : "❌ FAILED";
+
+            const multiTurnStatus =
+              "${{ steps.multi_turn_gate.outcome }}" === "success"
+                ? "✅ PASSED"
+                : "❌ FAILED";
+
+            const body = `## 🤖 AI Evaluation Report
+
+            ### Single-turn evaluation
+            **Status:** ${singleTurnStatus}
+
+            \`\`\`
+            ${singleTurnOutput}
+            \`\`\`
+
+            ### Multi-turn evaluation
+            **Status:** ${multiTurnStatus}
+
+            \`\`\`
+            ${multiTurnOutput}
+            \`\`\`
+
+            ---
+            *Generated automatically by GitHub Actions.*
+            `;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
 
 env:
   LANGSMITH_TRACING: ${{ secrets.LANGSMITH_TRACING }}

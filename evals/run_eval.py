@@ -38,7 +38,5 @@ if __name__ == "__main__":
         experiment_prefix="wa-agent-v1",
     )
 
-    print(f"\nExperiment name: {results.experiment_name}")
-    print(f"LangSmith URL: {results.url}")
     print(f"EXPERIMENT_NAME={results.experiment_name}")
 

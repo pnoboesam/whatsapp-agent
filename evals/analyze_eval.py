@@ -7,9 +7,8 @@ from langsmith import Client
 load_dotenv()
 
 DATASET_NAME = "wa-agent-v1"
-EXPERIMENT_NAME = "wa-agent-v1-d74c8cc5"
 
-# EXPERIMENT_NAME = os.getenv("EXPERIMENT_NAME")
+EXPERIMENT_NAME = os.getenv("EXPERIMENT_NAME")
 
 if not EXPERIMENT_NAME:
     raise RuntimeError(

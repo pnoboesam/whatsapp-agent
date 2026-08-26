@@ -40,4 +40,4 @@ if __name__ == "__main__":
         experiment_prefix="wa-agent-multiturn",
     )
 
-    print(results)
+    print(f"MULTITURN_EXPERIMENT_NAME={results.experiment_name}")

@@ -22,22 +22,39 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Run evaluation
-        id: evaluation
+      - name: Run single turn evaluation
+        id: single_turn_evaluation
         shell: bash
         run: |
           set -o pipefail
 
-          uv run python -m evals.run_eval | tee eval_output.txt
+          uv run python -m evals.run_eval | tee single_eval_output.txt
 
-          experiment_name=$(grep '^EXPERIMENT_NAME=' eval_output.txt | cut -d '=' -f2-)
+          experiment_name=$(grep '^EXPERIMENT_NAME=' single_eval_output.txt | cut -d '=' -f2-)
 
           echo "Experiment: $experiment_name"
 
           echo "EXPERIMENT_NAME=$experiment_name" >> "$GITHUB_ENV"
 
-      - name: Run regression gate
+      - name: Run multi-turn evaluation
+        id: multi_turn_evaluation
+        shell: bash
+        run: |
+          set -o pipefail
+
+          uv run python -m evals.run_multiturn_eval | tee multiturn_eval_output.txt
+
+          multiturn_experiment_name=$(grep '^MULTITURN_EXPERIMENT_NAME=' multiturn_eval_output.txt | cut -d '=' -f2-)
+
+          echo "MultiTurnExperiment: $multiturn_experiment_name"
+
+          echo "MULTITURN_EXPERIMENT_NAME=$multiturn_experiment_name" >> "$GITHUB_ENV"
+
+      - name: Run single-turn regression gate
         run: uv run python -m evals.analyze_eval
+
+      - name: Run multi-turn regression gate
+        run: uv run python -m evals.analyze_multiturn_eval
 
 env:
   LANGSMITH_TRACING: ${{ secrets.LANGSMITH_TRACING }}

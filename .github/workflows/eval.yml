@@ -121,6 +121,22 @@ jobs:
               body: body
             });
 
+      - name: Enforce regression gates
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.single_turn_gate.outcome }}" != "success" ]; then
+            echo "Single-turn regression gate failed."
+            exit 1
+          fi
+
+          if [ "${{ steps.multi_turn_gate.outcome }}" != "success" ]; then
+            echo "Multi-turn regression gate failed."
+            exit 1
+          fi
+
+          echo "All regression gates passed."
+
 env:
   LANGSMITH_TRACING: ${{ secrets.LANGSMITH_TRACING }}
   LANGSMITH_ENDPOINT: ${{ secrets.LANGSMITH_ENDPOINT }}

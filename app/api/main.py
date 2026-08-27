@@ -8,6 +8,7 @@ from app.api.routes.chat import router as chat_router
 from app.api.routes.whatsapp import router as whatsapp_router
 from app.api.routes.contact import router as contact_router
 from app.api.routes.conversation import router as conversations_router
+from app.api.routes.health import router as health_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -25,6 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(health_router)
 app.include_router(chat_router)
 app.include_router(whatsapp_router)
 app.include_router(contact_router)

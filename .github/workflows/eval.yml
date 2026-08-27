@@ -1,12 +1,13 @@
 name: Evaluation
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   evaluate:
@@ -51,10 +52,122 @@ jobs:
           echo "MULTITURN_EXPERIMENT_NAME=$multiturn_experiment_name" >> "$GITHUB_ENV"
 
       - name: Run single-turn regression gate
-        run: uv run python -m evals.analyze_eval
+        id: single_turn_gate
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+
+          uv run python -m evals.analyze_eval | tee single_regression_output.txt
 
       - name: Run multi-turn regression gate
-        run: uv run python -m evals.analyze_multiturn_eval
+        id: multi_turn_gate
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+
+          uv run python -m evals.analyze_multiturn_eval | tee multiturn_regression_output.txt
+
+      - name: Post evaluation results to PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+
+            const singleTurnOutput = fs.existsSync("single_regression_output.txt")
+              ? fs.readFileSync("single_regression_output.txt", "utf8")
+              : "No single-turn regression output found.";
+
+            const multiTurnOutput = fs.existsSync("multiturn_regression_output.txt")
+              ? fs.readFileSync("multiturn_regression_output.txt", "utf8")
+              : "No multi-turn regression output found.";
+
+            const singleTurnStatus =
+              "${{ steps.single_turn_gate.outcome }}" === "success"
+                ? "✅ PASSED"
+                : "❌ FAILED";
+
+            const multiTurnStatus =
+              "${{ steps.multi_turn_gate.outcome }}" === "success"
+                ? "✅ PASSED"
+                : "❌ FAILED";
+
+            const marker = "<!-- ai-evaluation-report -->";
+
+            const body = `${marker}
+            ## 🤖 AI Evaluation Report
+
+            ### Single-turn evaluation
+            **Status:** ${singleTurnStatus}
+
+            \`\`\`
+            ${singleTurnOutput}
+            \`\`\`
+
+            ### Multi-turn evaluation
+            **Status:** ${multiTurnStatus}
+
+            \`\`\`
+            ${multiTurnOutput}
+            \`\`\`
+
+            ---
+            *Generated automatically by GitHub Actions.*
+            `;
+
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                per_page: 100
+              }
+            );
+
+            const existingComment = comments.find(
+              comment =>
+                comment.user.type === "Bot" &&
+                comment.body.includes(marker)
+            );
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body
+              });
+
+              console.log(`Updated evaluation comment ${existingComment.id}`);
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body
+              });
+
+              console.log("Created evaluation comment");
+            }
+
+      - name: Enforce regression gates
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.single_turn_gate.outcome }}" != "success" ]; then
+            echo "Single-turn regression gate failed."
+            exit 1
+          fi
+
+          if [ "${{ steps.multi_turn_gate.outcome }}" != "success" ]; then
+            echo "Multi-turn regression gate failed."
+            exit 1
+          fi
+
+          echo "All regression gates passed."
 
 env:
   LANGSMITH_TRACING: ${{ secrets.LANGSMITH_TRACING }}

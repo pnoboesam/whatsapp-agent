@@ -1,6 +1,5 @@
 import os
 from dotenv import load_dotenv
-from icecream import ic as icprint
 from datetime import datetime, timezone
 
 from app.prompts.prompts import load_prompt
@@ -21,7 +20,6 @@ llm = ChatOpenRouter(
     model = 'openai/gpt-5.6-luna',
     temperature = 0,
 )
-
 
 def chat (thread_id: str, message: str) -> str:
 

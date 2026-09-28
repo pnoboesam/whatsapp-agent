@@ -13,6 +13,8 @@ from app.services.db_conversations import (
     update_conversation_after_message,
 )
 from app.services.db_messages import create_message
+from app.services.agent_memory import sync_message_to_agent
+
 
 from fastapi import APIRouter, Query, HTTPException, Request, status, BackgroundTasks
 
@@ -241,6 +243,11 @@ async def receive_message(request:Request, background_tasks: BackgroundTasks):
     )
 
     if not conversation["ai_enabled"]:
+        sync_message_to_agent(
+            conversation_id=conversation["id"],
+            message=text,
+            sender_type="customer"
+        )
         return {"status": "human_handling"}        
      
     background_tasks.add_task(

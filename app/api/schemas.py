@@ -10,3 +10,6 @@ class ChatResponse(BaseModel):
     response:str
     thread_id: str
     timestamp: datetime
+
+class HumanMessageRequest(BaseModel):
+    human_message: str

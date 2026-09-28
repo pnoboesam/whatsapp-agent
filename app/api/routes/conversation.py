@@ -1,6 +1,4 @@
 import logging
-
-from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException
 
 from app.db.client import supabase
@@ -10,14 +8,14 @@ from app.services.db_conversations import (
     set_conversation_ai_enabled,
     update_conversation_after_message,
 )
+from app.api.schemas import HumanMessageRequest
 from app.services.db_messages import create_message
 from app.services.whatsapp import send_message
+from app.services.agent_memory import sync_message_to_agent
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/conversations", tags=["conversations"])
 
-class HumanMessageRequest(BaseModel):
-    human_message: str
 
 @router.get("")
 def get_conversations(ai_enabled: bool | None = None, unread: bool | None = None):
@@ -104,6 +102,12 @@ async def send_human_message(conversation_id: str, request: HumanMessageRequest)
         conversation_id=conversation_id,
         message=human_message,
         increment_unread=False,
+    )
+
+    sync_message_to_agent(
+        conversation_id=conversation_id,
+        message=human_message,
+        sender_type="human"
     )
 
     logger.info(

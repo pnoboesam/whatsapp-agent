@@ -11,8 +11,8 @@ def chunker():
 
 
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-        chunk_size = 300,
-        chunk_overlap = 50
+        chunk_size = 800,
+        chunk_overlap = 100
     )
     chunks = text_splitter.split_documents(pages)
 

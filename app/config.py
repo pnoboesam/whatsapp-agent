@@ -6,6 +6,7 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
+PINECONE_API_KEY = os.getenv('PINECONE_API_KEY')
 
 REQUIRED_ENV_VARS = [
     "WHATSAPP_ACCESS_TOKEN",

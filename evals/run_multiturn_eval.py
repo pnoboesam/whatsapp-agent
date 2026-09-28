@@ -18,7 +18,8 @@ def target(inputs: dict) -> dict:
 
     for message in messages:
         response = chat(
-            thread_id=thread_id,
+            conversation_id=thread_id,
+            wa_number="233500000000",
             message=message,
         )
 

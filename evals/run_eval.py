@@ -19,7 +19,8 @@ def target(inputs: dict) -> dict:
     question = inputs["question"]
 
     answer = chat(
-        thread_id=f"eval-{uuid.uuid4()}",
+        conversation_id=f"eval-{uuid.uuid4()}",
+        wa_number="233500000000",
         message = question,
     )
 
@@ -40,4 +41,3 @@ if __name__ == "__main__":
     )
 
     print(f"EXPERIMENT_NAME={results.experiment_name}")
-

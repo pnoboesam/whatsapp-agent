@@ -1831,6 +1831,22 @@ wheels = [
 ]
 
 [[package]]
+name = "msgspec"
+version = "0.21.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e3/60/f79b9b013a16fa3a58350c9295ddc6789f2e335f36ea61ed10a21b215364/msgspec-0.21.1.tar.gz", hash = "sha256:2313508e394b0d208f8f56892ca9b2799e2561329de9763b19619595a6c0f72c", size = 319193, upload-time = "2026-04-12T21:44:50.394Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7e/74/f11ede02839b19ff459f88e3145df5d711626ca84da4e23520cebf819367/msgspec-0.21.1-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:764173717a01743f007e9f74520ed281f24672c604514f7d76c1c3a10e8edb66", size = 196176, upload-time = "2026-04-12T21:44:17.613Z" },
+    { url = "https://files.pythonhosted.org/packages/bb/40/4476c1bd341418a046c4955aff632ec769315d1e3cb94e6acf86d461f9ed/msgspec-0.21.1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:344c7cd0eaed1fb81d7959f99100ef71ec9b536881a376f11b9a6c4803365697", size = 188524, upload-time = "2026-04-12T21:44:18.815Z" },
+    { url = "https://files.pythonhosted.org/packages/ca/d9/9e9d7d7e5061b47540d03d640fab9b3965ba7ae49c1b2154861c8f007518/msgspec-0.21.1-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:48943e278b3854c2f89f955ddc6f9f430d3f0784b16e47d10604ee0463cd21f5", size = 218880, upload-time = "2026-04-12T21:44:20.028Z" },
+    { url = "https://files.pythonhosted.org/packages/74/66/2bb344f34abb4b57e60c7c9c761994e0417b9718ec1460bf00c296f2a7ea/msgspec-0.21.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a9aa659ebb0101b1cbc31461212b87e341d961f0ab0772aaf068a99e001ec4aa", size = 225050, upload-time = "2026-04-12T21:44:21.577Z" },
+    { url = "https://files.pythonhosted.org/packages/1a/84/7c1e412f76092277bf760cef12b7979d03314d259ab5b5cafde5d0c1722d/msgspec-0.21.1-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:f7b27d1a8ead2b6f5b0c4f2d07b8be1ccfcc041c8a0e704781edebe3ae13c484", size = 222713, upload-time = "2026-04-12T21:44:22.83Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/27/0bba04b2b4ef05f3d068429410bc71d2cea925f1596a8f41152cccd5edb8/msgspec-0.21.1-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:38fe93e86b61328fe544cb7fd871fad5a27c8734bfda90f65e5dbe288ae50f61", size = 227259, upload-time = "2026-04-12T21:44:24.11Z" },
+    { url = "https://files.pythonhosted.org/packages/b0/2d/09574b0eea02fed2c2c1383dbaae2c7f79dc16dcd6487a886000afb5d7c4/msgspec-0.21.1-cp313-cp313-win_amd64.whl", hash = "sha256:8bc666331c35fcce05a7cd2d6221adbe0f6058f8e750711413d22793c080ac6a", size = 189857, upload-time = "2026-04-12T21:44:25.359Z" },
+    { url = "https://files.pythonhosted.org/packages/46/34/105b1576ad182879914f0c821f17ee1d13abb165cb060448f96fe2aff078/msgspec-0.21.1-cp313-cp313-win_arm64.whl", hash = "sha256:42bb1241e0750c1a4346f2aa84db26c5ffd99a4eb3a954927d9f149ff2f42898", size = 175403, upload-time = "2026-04-12T21:44:26.608Z" },
+]
+
+[[package]]
 name = "multidict"
 version = "6.7.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2267,6 +2283,27 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/c9/f9/066794cca041b969964f779ee5fa66a9498bbf34248ac39c5d7954e4198f/pillow-12.3.0-cp313-cp313-win32.whl", hash = "sha256:a876864214e136f0eb367788dbd7df045f4806801518e2cfe9e13229cfe06d8f", size = 6473287, upload-time = "2026-07-01T11:54:44.9Z" },
     { url = "https://files.pythonhosted.org/packages/a6/9b/7a58e61d62be561da3a356fe2384d4059a6345fc130e23ef1c36a5b81d24/pillow-12.3.0-cp313-cp313-win_amd64.whl", hash = "sha256:1cca606cd25738df4ed873d5ad46bbdb3d83b5cbca291f6b4ff13a4df6b0bbe8", size = 7239691, upload-time = "2026-07-01T11:54:47.141Z" },
     { url = "https://files.pythonhosted.org/packages/aa/b0/c4ed4f0ef8f8fa5ee8351537db6650bb8189f7e118842978dd6589065692/pillow-12.3.0-cp313-cp313-win_arm64.whl", hash = "sha256:b629de27fda84b42cde7edef0d85f13b958b47f6e9bbcbba9b673c562a89bd8b", size = 2568185, upload-time = "2026-07-01T11:54:49.137Z" },
+]
+
+[[package]]
+name = "pinecone"
+version = "10.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "httpx", extra = ["http2"] },
+    { name = "msgspec" },
+    { name = "orjson" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a5/97/f04b682e5d65d4cd09b76afd691f8834cf2c28d82bc942ad637a2c15c74d/pinecone-10.0.0.tar.gz", hash = "sha256:6066bbe9a7ae1d667cde08d262deb6fbea6feb35deb9177dd47141b55bbd9833", size = 525129, upload-time = "2026-09-03T14:31:22.729Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0f/c7/9d61f9a4adaaa6e315a0425c2127b449bda64633a9c50bc533ff71c0c894/pinecone-10.0.0-cp310-abi3-macosx_10_12_x86_64.whl", hash = "sha256:995c06e905940b10bb2aefe653225340b5a3f56f3efb373fe07f4e57b5043705", size = 3098155, upload-time = "2026-09-03T14:31:11.281Z" },
+    { url = "https://files.pythonhosted.org/packages/ec/78/d73c0aa1030931a1b28151c4ff727b793e443a4531521bc89a1d4c3124a0/pinecone-10.0.0-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:0994270c514b16c72ec94dd6c29ff2708b81d30ff8467e19de192a28a7c86b7e", size = 3070497, upload-time = "2026-09-03T14:31:12.998Z" },
+    { url = "https://files.pythonhosted.org/packages/8a/3e/3b9dba42741ed8faf011d7bce8e1fd10f45dd0503e2888eceafa6be33424/pinecone-10.0.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d482ed27a805cbd4aca2660da212008dd6e41d87d255279f405ff13b725970e2", size = 3353834, upload-time = "2026-09-03T14:31:14.431Z" },
+    { url = "https://files.pythonhosted.org/packages/22/35/50e23cac1d73c921b8cc2eb02c9ad2691f62e8b906db49237bcf85f90676/pinecone-10.0.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:94d4c64779f3213a5cc538d3bd10a873da192cb9b0039db56690e556ba00b55c", size = 3291380, upload-time = "2026-09-03T14:31:16.052Z" },
+    { url = "https://files.pythonhosted.org/packages/04/ef/705e49608eac5803b9b55b6cfae2cac736c0395e709f7668f52c89afc99b/pinecone-10.0.0-cp310-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:0e05956a3201b1fbb54a1861277df919318a4941797f2d87fd558ac5ec232151", size = 3528743, upload-time = "2026-09-03T14:31:17.558Z" },
+    { url = "https://files.pythonhosted.org/packages/7f/a4/11795c174225b9dea5054618c91b956d0a26b3d7167a5d3531e167712e83/pinecone-10.0.0-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:3ab0c843b4fb04fbac22f1b8455e389063208a50f6a95d7a90627939968198de", size = 3574713, upload-time = "2026-09-03T14:31:19.198Z" },
+    { url = "https://files.pythonhosted.org/packages/bd/5d/93d123cfcf458ccc2defa4c0363be5fb7aabfcd375cd2414a3e944e7f55a/pinecone-10.0.0-cp310-abi3-win_amd64.whl", hash = "sha256:2f4e3200ee3562d195802b363487dd7fe6039a8c13630fc25fa3e8726c7a8654", size = 2924160, upload-time = "2026-09-03T14:31:21.107Z" },
 ]
 
 [[package]]
@@ -3541,6 +3578,7 @@ dependencies = [
     { name = "langsmith" },
     { name = "mcp" },
     { name = "notebook" },
+    { name = "pinecone" },
     { name = "psycopg-binary" },
     { name = "pypdf" },
     { name = "rank-bm25" },
@@ -3570,6 +3608,7 @@ requires-dist = [
     { name = "langsmith", specifier = ">=0.10.15" },
     { name = "mcp", specifier = ">=2.0.0" },
     { name = "notebook", specifier = ">=7.6.1" },
+    { name = "pinecone", specifier = ">=10.0.0" },
     { name = "psycopg-binary", specifier = ">=3.3.4" },
     { name = "pypdf", specifier = ">=6.14.2" },
     { name = "rank-bm25", specifier = ">=0.2.2" },

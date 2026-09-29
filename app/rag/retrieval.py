@@ -1,32 +1,56 @@
-from icecream import ic as print
-from langchain_chroma import Chroma
+from pinecone import Pinecone
+
 from langchain_classic.retrievers import EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
 
 from .chunker import chunks
-from .embedding import get_embedding_model
-from app.config import BASE_DIR
+from .embeddings import get_embedding_model
+from .pinecone_retriever import PineconeRetriever
+
+from app.config import PINECONE_API_KEY
 
 
-CHROMA_DIR = BASE_DIR / "data" / "chroma_db"
+INDEX_NAME = "elitecare"
+NAMESPACE = "clinic_knowledge_docs"
 
-def get_retriever(k:int = 5):
-    vector_store = Chroma(
-        persist_directory=CHROMA_DIR,
-        embedding_function=get_embedding_model()
+
+def get_retriever(k: int = 5):
+
+    # -------------------------
+    # Pinecone
+    # -------------------------
+
+    pc = Pinecone(api_key=PINECONE_API_KEY)
+
+    index = pc.Index(INDEX_NAME)
+
+    embedding_model = get_embedding_model()
+
+    vector_retriever = PineconeRetriever(
+        index=index,
+        embedding_model=embedding_model,
+        namespace=NAMESPACE,
+        k=k,
     )
-    vector_retriever = vector_store.as_retriever(search_type="mmr", search_kwargs={"k": k})
 
+    # -------------------------
+    # BM25
+    # -------------------------
 
     bm25_retriever = BM25Retriever.from_documents(chunks)
+
     bm25_retriever.k = k
+
+    # -------------------------
+    # Hybrid retrieval
+    # -------------------------
 
     retriever = EnsembleRetriever(
         retrievers=[
             vector_retriever,
             bm25_retriever,
         ],
-        weights=[0.7, 0.3]
+        weights=[0.5, 0.5],
     )
 
     return retriever

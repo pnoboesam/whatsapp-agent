@@ -83,3 +83,20 @@ def set_conversation_ai_enabled(
             "p_ai_enabled": ai_enabled,
         },
     ).execute()
+
+
+def handoff_conversation(
+    conversation_id: str,
+    reason: str,
+):
+    supabase.rpc(
+        "handoff_conversation",
+        {
+            "p_conversation_id": conversation_id,
+            "p_reason": reason,
+        },
+    ).execute()
+
+
+if __name__ == "__main__":
+    pass

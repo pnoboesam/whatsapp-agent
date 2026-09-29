@@ -26,7 +26,7 @@ llm = ChatOpenRouter(
 
 def chat (
         conversation_id: str,
-        thread_id: str,
+        wa_number: str,
         message: str
     ) -> str:
 
@@ -35,7 +35,7 @@ def chat (
 
         prompt = PromptTemplate.from_template(prompt_template)
         SYSTEM_PROMPT = prompt.invoke({
-            "wa_number": thread_id, 
+            "wa_number": wa_number, 
             "current_time": datetime.now(timezone.utc).isoformat()
             }).text
     
@@ -51,7 +51,7 @@ def chat (
             checkpointer=checkpointer,
         )
 
-        config = {'configurable': {'thread_id': thread_id}}
+        config = {'configurable': {'thread_id': conversation_id}}
 
    
         result = agent.invoke(

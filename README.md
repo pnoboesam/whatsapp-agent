@@ -19,6 +19,8 @@ question, capturing lead information, and qualifying the lead.
 
 - **Lead capture and qualification** — Collects relevant lead information and qualifies prospective customers through conversation.
 
+- **Human handoff** — Automatically disables AI responses when a customer requests to speak with a human, allowing staff to take over the conversation.
+
 - **Appointment booking** — Guides customers through the booking workflow and collects the information required to schedule an appointment.
 
 - **Lead management with Google Sheets** — Uses a Google Sheets integration as an agent tool to record and manage captured lead information.
@@ -69,10 +71,10 @@ The agent uses a hybrid retrieval pipeline to ground responses in the business k
 
 User questions are passed to two complementary retrievers:
 
-- **Vector retrieval** using Chroma with `text-embedding-3-small` and Maximal Marginal Relevance (MMR).
+- **Vector retrieval** using Pinecone with `text-embedding-3-small`.
 - **Lexical retrieval** using BM25.
 
-Both retrievers return their top 5 results. The results are combined using weighted Reciprocal Rank Fusion (RRF), with a weight of `0.7` for vector retrieval and `0.3` for BM25. The resulting documents are provided to the agent as context for generating grounded responses.
+Both retrievers return their top 5 results. The results are combined using weighted Reciprocal Rank Fusion (RRF), with equal weights of `0.5` for vector retrieval and `0.5` for BM25. The resulting documents are provided to the agent as context for generating grounded responses.
 
 This hybrid approach combines semantic similarity with keyword-based retrieval, allowing the system to handle both conceptually similar questions and queries containing specific business terminology.
 
@@ -86,9 +88,11 @@ This hybrid approach combines semantic similarity with keyword-based retrieval, 
 
    The webhook extracts the incoming message and WhatsApp number, then determines whether the AI agent is currently enabled for the business.
 
-3. **Human takeover when AI is disabled**
+3. **Human takes over when AI is disabled**
 
-   If the AI agent is turned off, the message is routed to the human-handling workflow. Staff can respond to the customer through the Next.js dashboard without AI-generated responses interfering with the conversation.
+   The AI agent can be disabled either by business staff or automatically by the AI agent based on defined business rules. For example, the agent can disable itself when a customer explicitly requests to speak with a human.
+
+   When AI is disabled, the conversation is routed to the human-handling workflow. Staff can respond to the customer through the Next.js dashboard without AI-generated responses interfering with the conversation.
 
 4. **AI agent processes the conversation**
 
@@ -122,7 +126,7 @@ This hybrid approach combines semantic similarity with keyword-based retrieval, 
 
 ### Retrieval & Knowledge
 
-- **Chroma** — Vector store for semantic retrieval.
+- **Pinecone** — Vector store for semantic retrieval.
 - **OpenAI `text-embedding-3-small`** — Document embeddings.
 - **BM25** — Lexical keyword-based retrieval.
 - **Ensemble Retrieval / Weighted RRF** — Combines semantic and lexical retrieval results.
@@ -294,6 +298,14 @@ SUPABASE_SERVICE_ROLE_KEY=
 DATABASE_URL=
 ```
 
+### Pinecone
+
+Used for access vector store.
+
+```env
+PINECONE_API_KEY=
+```
+
 ### WhatsApp / Meta
 
 Used for WhatsApp webhook verification, request signature verification, and sending messages.
@@ -336,6 +348,8 @@ OPENROUTER_API_KEY=your_openrouter_api_key
 SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 DATABASE_URL=your_database_url
+
+PINECONE_API_KEY=your_pinecone_api_key
 
 META_APP_SECRET=your_meta_app_secret
 WHATSAPP_PHONE_NUMBER_ID=your_whatsapp_phone_number_id
@@ -490,7 +504,7 @@ PASS / FAIL
 
 The agent uses a hybrid retrieval strategy that combines semantic vector retrieval with BM25 lexical retrieval.
 
-Chroma provides vector-based retrieval using `text-embedding-3-small` and Maximal Marginal Relevance (MMR), while BM25 provides keyword-based retrieval. The results are combined using weighted Reciprocal Rank Fusion (RRF), with weights of `0.7` for vector retrieval and `0.3` for BM25.
+Chroma provides vector-based retrieval using `text-embedding-3-small`, while BM25 provides keyword-based retrieval. The results are combined using weighted Reciprocal Rank Fusion (RRF), with weights of `0.5` for vector retrieval and `0.5` for BM25.
 
 This approach allows the system to benefit from both semantic similarity and exact keyword matching when retrieving information from the business knowledge base.
 
@@ -498,13 +512,15 @@ This approach allows the system to benefit from both semantic similarity and exa
 
 The agent uses LangGraph's PostgreSQL checkpointer to maintain conversation state across multiple messages.
 
-The customer's WhatsApp number is used as the conversation thread identifier, allowing the agent to retrieve previous conversational context when processing subsequent messages.
+The application's conversation ID is used as the LangGraph thread identifier, allowing the agent to retrieve and maintain the relevant conversational context across subsequent messages.
 
 ### Human-in-the-loop Control
 
-The application gives businesses the ability to disable the AI agent and allow staff to handle conversations directly.
+The application allows the AI agent to be disabled either manually by business staff or automatically by the agent when defined business rules require human intervention.
 
-This provides a manual takeover mechanism for situations where human assistance is preferred or required, rather than forcing every customer interaction through the AI agent.
+For example, if a customer explicitly requests to speak with a human, the agent can trigger a human handoff and disable further AI responses for that conversation. Staff can then handle the conversation through the Next.js dashboard.
+
+Customer and staff messages exchanged during human takeover are synchronized with the agent's conversation state, allowing the AI to resume with the relevant context if it is re-enabled.
 
 ### Tool-based Business Actions
 
@@ -529,8 +545,6 @@ Changes are developed on feature branches and submitted through pull requests ta
 This provides a controlled path for introducing changes while allowing the automated evaluation and regression pipeline to validate agent behavior before the changes reach production.
 
 ## Limitations
-
-- **Conversation memory across human takeover** — The agent's conversation memory currently does not include messages sent by human staff after an AI takeover. If the AI is later re-enabled for the same conversation, the agent may lose context from the period when a human was handling the conversation.
 
 - **No long-term memory** — The agent currently relies on conversational state rather than a dedicated long-term memory system. Information that may be useful across separate conversations is not yet persisted as long-term agent memory.
 
